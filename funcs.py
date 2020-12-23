@@ -1,7 +1,7 @@
 import pygame
 
 
-def load_image(filename, width, height, colorkey=None):
+def load_image(filename: str, width: int, height: int, colorkey=None) -> pygame.Surface:
     '''
 
     :param filename: имя файла в папке
@@ -12,7 +12,7 @@ def load_image(filename, width, height, colorkey=None):
     '''
 
     # получаем полный путь к файлу
-    fullname = f'data/scripts/{filename}'
+    fullname = f'data/sprites/{filename}'
 
     # загружаем имеющееся изображение
     image = pygame.image.load(fullname)
@@ -23,8 +23,6 @@ def load_image(filename, width, height, colorkey=None):
         if colorkey == -1:
             colorkey = image.get_at((0, 0))
         image.set_colorkey(colorkey)
-    else:
-        image = image.convert_alpha()
 
     # делаем изображение нужные размеры
     im_width = image.get_width()
@@ -33,3 +31,20 @@ def load_image(filename, width, height, colorkey=None):
         image = pygame.transform.scale(image, (width, height))
 
     return image
+
+
+def load_level(filename: str) -> list:
+    '''
+
+    :param filename: имя файла в папке
+    :return: двумерный список, который представляет собой карту уровня
+    '''
+
+    # получаем полный путь к файлу
+    fullname = f'data/levels/{filename}'
+
+    # читаем карту уровня из файла
+    with open(fullname, 'r') as file:
+        level_map = list(map(lambda x: list(x.rstrip('\n')), file.readlines()))
+
+    return level_map
