@@ -26,6 +26,10 @@ if __name__ == '__main__':
     player, level_width, level_height = second_state_funcs.generate_level(level_map, tile_group, player_group,
                                                                           all_sprites)
 
+    # добавляем камеру
+    camera = classes.Camera(second_state_funcs.camera_configure, (level_width + 1) * constants.TILE_WIDTH,
+                            (level_height + 1) * constants.TILE_HEIGHT)
+
     # игровой цикл
     while game_loop:
 
@@ -62,7 +66,11 @@ if __name__ == '__main__':
 
         # отрисовка всех спрайтов
         screen.fill('white')
-        all_sprites.draw(screen)
+        # all_sprites.draw(screen)
+        camera.update(player)
+        for sprite in all_sprites:
+            screen.blit(sprite.image, camera.apply(sprite))
+        pygame.display.update()
 
         clock.tick(constants.FPS)
         pygame.display.flip()

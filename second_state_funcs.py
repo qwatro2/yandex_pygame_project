@@ -14,7 +14,7 @@ def generate_level(level_map: list, tile_group: pygame.sprite.Group, player_grou
     :return: экземпляр класса classes.Player, ширину и высоту уровня
     '''
 
-    new_player = None
+    new_player, x, y = [None] * 3
 
     # циклом проходимся по всем элементам карты, создавая спрайты
     for y in range(len(level_map)):
@@ -34,3 +34,16 @@ def generate_level(level_map: list, tile_group: pygame.sprite.Group, player_grou
                                             all_sprites)
 
     return new_player, x, y
+
+
+def camera_configure(camera, target_rect) -> pygame.Rect:
+    left, top, _, _ = target_rect
+    _, _, w, h = camera
+    left, top = -left + constants.WIDTH // 2, -top + constants.HEIGHT // 2
+
+    left = min(0, left)  # камера не движется дальше левой границы
+    left = max(-(camera.width - constants.WIDTH), left)  # камера не движется дальше правой границы
+    top = max(-(camera.height - constants.HEIGHT), top)  # камера не движется дальше нижней границы
+    top = min(0, top)  # камера не движется дальше верхней границы
+
+    return pygame.Rect(left, top, w, h)
