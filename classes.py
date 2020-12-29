@@ -1,5 +1,6 @@
 import pygame
-import funcs
+import constants
+import first_state_funcs
 
 
 class BaseBlock(pygame.sprite.Sprite):
@@ -8,7 +9,7 @@ class BaseBlock(pygame.sprite.Sprite):
     Родительский класс для других блоков.
     '''
 
-    image = funcs.load_image('base_block.png', 50, 50)
+    image = first_state_funcs.load_image('base_block.png', constants.TILE_WIDTH, constants.TILE_HEIGHT)
 
     def __init__(self, x, y, *groups):
         super().__init__(*groups)
@@ -17,16 +18,13 @@ class BaseBlock(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
-    def get_rect(self):
-        return self.rect
-
 
 class Player(pygame.sprite.Sprite):
     '''
     Класс Игрока.
     '''
 
-    image = funcs.load_image('base_player.png', 50, 50)
+    image = first_state_funcs.load_image('base_player.png', constants.TILE_WIDTH, constants.TILE_HEIGHT)
 
     def __init__(self, x, y, *groups):
         super().__init__(*groups)
@@ -34,6 +32,3 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-
-    def get_rect(self):
-        return self.rect
