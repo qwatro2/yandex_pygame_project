@@ -4,14 +4,14 @@ import classes
 
 
 def generate_level(level_map: list, tile_group: pygame.sprite.Group, player_group: pygame.sprite.Group,
-                   all_sprites: pygame.sprite.Group) -> classes.Player:
+                   all_sprites: pygame.sprite.Group) -> tuple:
     '''
 
     :param level_map: двумерный список - карта уровня
     :param tile_group: группа тайлов
     :param player_group: группа игрока
     :param all_sprites: группа всех спрайтов
-    :return: экземпляр класса classes.Player
+    :return: экземпляр класса classes.Player, ширину и высоту уровня
     '''
 
     new_player = None
@@ -33,4 +33,4 @@ def generate_level(level_map: list, tile_group: pygame.sprite.Group, player_grou
                 new_player = classes.Player(x * constants.TILE_WIDTH, y * constants.TILE_HEIGHT, player_group,
                                             all_sprites)
 
-    return new_player
+    return new_player, x, y
