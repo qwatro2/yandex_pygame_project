@@ -22,7 +22,7 @@ if __name__ == '__main__':
     pygame.display.set_caption('caption')
 
     # генерация уровня
-    level_map = first_state_funcs.load_level('test_level.txt')
+    level_map = first_state_funcs.load_level('lil_level.txt')
     player, level_width, level_height = second_state_funcs.generate_level(level_map, tile_group, player_group,
                                                                           all_sprites)
 
@@ -61,12 +61,38 @@ if __name__ == '__main__':
                 if event.key == pygame.K_SPACE:
                     up = False
 
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+
+                if event.button == 1:
+
+                    if player.get_number_of_blocks() > 0:
+
+                        new_block_x, new_block_y = None, None
+
+                        if player.get_direction() == 0:
+
+                            new_block_x = player.get_rect().left - constants.TILE_WIDTH
+
+                        else:
+
+                            new_block_x = player.get_rect().right + constants.TILE_WIDTH
+
+                        new_block_y = player.get_rect().top
+
+                        new_block = classes.BaseBlock(new_block_x * constants.TILE_WIDTH,
+                                                      new_block_y * constants.TILE_HEIGHT)
+
+                        if pygame.sprite.spritecollideany(new_block, tile_group):
+                            new_block.kill()
+                        else:
+                            tile_group.add(new_block)
+                            all_sprites.add(new_block)
+
         # обновление всех спрайтов
         all_sprites.update(left, right, up, tile_group)
 
         # отрисовка всех спрайтов
         screen.fill('white')
-        # all_sprites.draw(screen)
         camera.update(player)
         for sprite in all_sprites:
             screen.blit(sprite.image, camera.apply(sprite))
