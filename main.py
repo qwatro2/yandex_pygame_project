@@ -47,7 +47,7 @@ if __name__ == '__main__':
                 if event.key in (pygame.K_RIGHT, pygame.K_d):
                     right = True
 
-                if event.key == pygame.K_SPACE:
+                if event.key in (pygame.K_SPACE, pygame.K_UP, pygame.K_w):
                     up = True
 
             elif event.type == pygame.KEYUP:
@@ -58,7 +58,7 @@ if __name__ == '__main__':
                 if event.key in (pygame.K_RIGHT, pygame.K_d):
                     right = False
 
-                if event.key == pygame.K_SPACE:
+                if event.key in (pygame.K_SPACE, pygame.K_UP, pygame.K_w):
                     up = False
 
         # обновление всех спрайтов
