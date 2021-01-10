@@ -83,7 +83,6 @@ if __name__ == '__main__':
                                                       new_block_y)
 
                         if pygame.sprite.spritecollideany(new_block, tile_group):
-                            print(1)
                             new_block.kill()
                         else:
                             tile_group.add(new_block)

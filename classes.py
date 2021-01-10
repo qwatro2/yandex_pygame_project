@@ -28,11 +28,12 @@ class Player(pygame.sprite.Sprite):
     Класс Игрока.
     '''
 
-    image = first_state_funcs.load_image('base_player.png', constants.TILE_WIDTH, constants.TILE_HEIGHT)
+    rimage = first_state_funcs.load_image('Stone_Golem.png', constants.TILE_WIDTH, constants.TILE_HEIGHT)
+    limage = first_state_funcs.load_image('Stone_Golem-.png', constants.TILE_WIDTH, constants.TILE_HEIGHT)
 
     def __init__(self, x, y, *groups):
         super().__init__(*groups)
-        self.image = Player.image
+        self.image = Player.rimage
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -46,6 +47,17 @@ class Player(pygame.sprite.Sprite):
         self.vx = 0
         self.vy = 0
         self.on_ground = False
+
+        self.rwalk = [
+            first_state_funcs.load_image(f'Stone_Walking\Stone_Golem_Walking_{str(i).rjust(3, "0")}.png',
+                                         constants.TILE_WIDTH,
+                                         constants.TILE_HEIGHT) for i in range(24)]
+        self.rwalk_number = 0
+        self.lwalk = [
+            first_state_funcs.load_image(f'Stone_Walking\Stone_Golem_Walking_-{str(i).rjust(3, "0")}.png',
+                                         constants.TILE_WIDTH,
+                                         constants.TILE_HEIGHT) for i in range(24)]
+        self.lwalk_number = 0
 
     def update(self, left, right, up, tile_group):
         if left:
@@ -73,6 +85,24 @@ class Player(pygame.sprite.Sprite):
 
         self.rect.y += self.vy
         self.collide(0, self.vy, tile_group)
+        if left or right or up:
+            if self.direction == 1:
+                self.lwalk_number = 0
+                self.image = self.rwalk[self.rwalk_number]
+                self.rwalk_number += 1
+                self.rwalk_number %= len(self.rwalk)
+            else:
+                self.rwalk_number = 0
+                self.image = self.lwalk[self.lwalk_number]
+                self.lwalk_number += 1
+                self.lwalk_number %= len(self.lwalk)
+        else:
+            if self.direction == 1:
+                self.image = Player.rimage
+            else:
+                self.image = Player.limage
+            self.rwalk_number = 0
+            self.lwalk_number = 0
 
     def collide(self, vx, vy, tile_group):
         for tile in tile_group:
