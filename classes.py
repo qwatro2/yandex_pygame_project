@@ -1,3 +1,4 @@
+import time
 import pygame
 import constants
 import first_state_funcs
@@ -15,8 +16,8 @@ class BaseBlock(pygame.sprite.Sprite):
         super().__init__(*groups)
         self.image = BaseBlock.image
         self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        self.rect.left = x
+        self.rect.top = y
 
     def get_rect(self):
         return self.rect
@@ -36,6 +37,12 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
+        self.number_of_blocks = 10
+        self.direction = 1  # 1, если смотрим направо, иначе 0
+
+        self.to_go_x = x
+        self.to_go_y = y
+
         self.vx = 0
         self.vy = 0
         self.on_ground = False
@@ -43,9 +50,11 @@ class Player(pygame.sprite.Sprite):
     def update(self, left, right, up, tile_group):
         if left:
             self.vx = -constants.MOVE_SPEED
+            self.direction = 0
 
         if right:
             self.vx = constants.MOVE_SPEED
+            self.direction = 1
 
         if up:
             if self.on_ground:
@@ -67,6 +76,7 @@ class Player(pygame.sprite.Sprite):
 
     def collide(self, vx, vy, tile_group):
         for tile in tile_group:
+
             if pygame.sprite.collide_rect(self, tile):
 
                 if vx > 0:
@@ -83,6 +93,30 @@ class Player(pygame.sprite.Sprite):
                 if vy < 0:
                     self.rect.top = tile.get_rect().bottom
                     self.vy = 0
+
+    def move(self, x, y):
+        self.rect.x = x
+        self.rect.y = y
+
+    def die(self):
+        time.sleep(500)
+        self.move(self.to_go_x, self.to_go_y)
+
+    def set_to_go_coords(self, x, y):
+        self.to_go_x = x
+        self.to_go_y = y
+
+    def add_number_of_blocks(self, value):
+        self.number_of_blocks += value
+
+    def get_number_of_blocks(self):
+        return self.number_of_blocks
+
+    def get_rect(self):
+        return self.rect
+
+    def get_direction(self):
+        return self.direction
 
 
 class Camera:
