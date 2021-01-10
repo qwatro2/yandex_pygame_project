@@ -75,14 +75,15 @@ if __name__ == '__main__':
 
                         else:
 
-                            new_block_x = player.get_rect().right + constants.TILE_WIDTH
+                            new_block_x = player.get_rect().right
 
                         new_block_y = player.get_rect().top
 
-                        new_block = classes.BaseBlock(new_block_x * constants.TILE_WIDTH,
-                                                      new_block_y * constants.TILE_HEIGHT)
+                        new_block = classes.BaseBlock(new_block_x,
+                                                      new_block_y)
 
                         if pygame.sprite.spritecollideany(new_block, tile_group):
+                            print(1)
                             new_block.kill()
                         else:
                             tile_group.add(new_block)
