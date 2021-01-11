@@ -10,7 +10,7 @@ class BaseBlock(pygame.sprite.Sprite):
     Родительский класс для других блоков.
     '''
 
-    image = first_state_funcs.load_image('base_block.png', constants.TILE_WIDTH, constants.TILE_HEIGHT)
+    image = first_state_funcs.load_image('Stone.png', constants.TILE_WIDTH, constants.TILE_HEIGHT)
 
     def __init__(self, x, y, *groups):
         super().__init__(*groups)
