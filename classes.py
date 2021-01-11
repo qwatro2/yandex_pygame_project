@@ -35,6 +35,7 @@ class Player(pygame.sprite.Sprite):
         super().__init__(*groups)
         self.image = Player.rimage
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect.x = x
         self.rect.y = y
 
@@ -139,11 +140,12 @@ class Player(pygame.sprite.Sprite):
                     self.image = Player.limage
                 self.rwalk_number = 0
                 self.lwalk_number = 0
+        self.mask = pygame.mask.from_surface(self.image)
 
     def collide(self, vx, vy, tile_group):
         for tile in tile_group:
 
-            if pygame.sprite.collide_rect(self, tile):
+            if pygame.sprite.collide_mask(self, tile):
 
                 if vx > 0:
                     self.rect.right = tile.get_rect().left
