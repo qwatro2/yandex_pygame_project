@@ -22,7 +22,7 @@ if __name__ == '__main__':
     pygame.display.set_caption('caption')
 
     # генерация уровня
-    level_map = first_state_funcs.load_level('lil_level.txt')
+    level_map = first_state_funcs.load_level('test_level.txt')
     player, level_width, level_height = second_state_funcs.generate_level(level_map, tile_group, player_group,
                                                                           all_sprites)
 
