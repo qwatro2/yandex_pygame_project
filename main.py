@@ -12,14 +12,12 @@ if __name__ == '__main__':
     # инициализация констант игры
     game_loop = True
     screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
-
     pygame.mixer.music.load('data\music\Toccata_et_Fugue.ogg')
     pygame.mixer.music.play(-1)
-
     clock = pygame.time.Clock()
     all_sprites = pygame.sprite.Group()
-    tile_group = pygame.sprite.Group()
     checkpoints_group = pygame.sprite.Group()
+    tile_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
     left, right, up = [False] * 3
 
@@ -109,7 +107,7 @@ if __name__ == '__main__':
                     checkpoint.set_is_on()
 
         # отрисовка всех спрайтов
-        screen.fill('black')
+        screen.fill('blue')
         camera.update(player)
         for sprite in all_sprites:
             screen.blit(sprite.image, camera.apply(sprite))
@@ -120,4 +118,3 @@ if __name__ == '__main__':
 
     # закрытие библиотеки pygame
     pygame.quit()
-    
