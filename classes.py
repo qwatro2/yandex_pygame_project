@@ -23,6 +23,36 @@ class BaseBlock(pygame.sprite.Sprite):
         return self.rect
 
 
+class Checkpoint(pygame.sprite.Sprite):
+    '''
+    Класс Чекпоинта.
+    '''
+
+    image_off = first_state_funcs.load_image('base_checkpoint_off.png', constants.CHECKPOINT_WIDTH,
+                                             constants.CHECKPOINT_HEIGHT)
+
+    image_on = first_state_funcs.load_image('base_checkpoint_on.png', constants.CHECKPOINT_WIDTH,
+                                            constants.CHECKPOINT_HEIGHT)
+
+    def __init__(self, x, y, *groups):
+        super().__init__(*groups)
+        self.image = Checkpoint.image_off
+        self.rect = self.image.get_rect()
+        self.rect.left = x
+        self.rect.top = y
+        self.is_on = False
+
+    def get_is_on(self):
+        return self.is_on
+
+    def set_is_on(self):
+        self.is_on = True
+        self.image = Checkpoint.image_on
+
+    def get_coords(self):
+        return self.rect.left, self.rect.top
+
+
 class Player(pygame.sprite.Sprite):
     '''
     Класс Игрока.
