@@ -12,6 +12,8 @@ if __name__ == '__main__':
     # инициализация констант игры
     game_loop = True
     screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
+    pygame.mixer.music.load('data\music\Toccata_et_Fugue.ogg')
+    pygame.mixer.music.play(-1)
     clock = pygame.time.Clock()
     all_sprites = pygame.sprite.Group()
     tile_group = pygame.sprite.Group()
