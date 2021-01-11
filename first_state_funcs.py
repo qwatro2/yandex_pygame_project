@@ -1,5 +1,8 @@
 import pygame
 
+pygame.init()
+screen = pygame.display.set_mode((1000, 1000))
+
 
 def load_image(filename: str, width: int, height: int, colorkey=None) -> pygame.Surface:
     '''

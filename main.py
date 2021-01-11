@@ -94,7 +94,7 @@ if __name__ == '__main__':
         all_sprites.update(left, right, up, tile_group)
 
         # отрисовка всех спрайтов
-        screen.fill('white')
+        screen.fill('red')
         camera.update(player)
         for sprite in all_sprites:
             screen.blit(sprite.image, camera.apply(sprite))
