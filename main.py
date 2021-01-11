@@ -87,8 +87,6 @@ if __name__ == '__main__':
                         else:
                             tile_group.add(new_block)
                             all_sprites.add(new_block)
-                else:
-                    player.die()
 
         # обновление всех спрайтов
         all_sprites.update(left, right, up, tile_group)
