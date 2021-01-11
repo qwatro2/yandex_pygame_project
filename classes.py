@@ -102,20 +102,19 @@ class Player(pygame.sprite.Sprite):
             if up:
                 if self.on_ground:
                     self.vy = -constants.JUMP_POWER
-                    self.on_ground = False
 
             if not (left or right):
                 self.vx = 0
 
             if not self.on_ground:
                 self.vy += constants.GRAVITY
-
+            self.on_ground = False
             self.rect.x += self.vx
             self.collide(self.vx, 0, tile_group)
 
             self.rect.y += self.vy
             self.collide(0, self.vy, tile_group)
-            if not self.on_ground:
+            if not (-1 < self.vy < 1):
                 self.lwalk_number = 0
                 self.rwalk_number = 0
                 if self.direction == 1:
