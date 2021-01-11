@@ -12,9 +12,14 @@ if __name__ == '__main__':
     # инициализация констант игры
     game_loop = True
     screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
+
+    pygame.mixer.music.load('data\music\Toccata_et_Fugue.ogg')
+    pygame.mixer.music.play(-1)
+
     clock = pygame.time.Clock()
     all_sprites = pygame.sprite.Group()
     tile_group = pygame.sprite.Group()
+    checkpoints_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
     left, right, up = [False] * 3
 
@@ -24,7 +29,7 @@ if __name__ == '__main__':
     # генерация уровня
     level_map = first_state_funcs.load_level('test_level.txt')
     player, level_width, level_height = second_state_funcs.generate_level(level_map, tile_group, player_group,
-                                                                          all_sprites)
+                                                                          checkpoints_group, all_sprites)
 
     # добавляем камеру
     camera = classes.Camera(second_state_funcs.camera_configure, (level_width + 1) * constants.TILE_WIDTH,
@@ -47,8 +52,12 @@ if __name__ == '__main__':
                 if event.key in (pygame.K_RIGHT, pygame.K_d):
                     right = True
 
-                if event.key == pygame.K_SPACE:
+                if event.key in (pygame.K_SPACE, pygame.K_UP, pygame.K_w):
                     up = True
+
+                # DEBUG
+                if event.key == pygame.K_0:
+                    player.die()
 
             elif event.type == pygame.KEYUP:
 
@@ -58,15 +67,49 @@ if __name__ == '__main__':
                 if event.key in (pygame.K_RIGHT, pygame.K_d):
                     right = False
 
-                if event.key == pygame.K_SPACE:
+                if event.key in (pygame.K_SPACE, pygame.K_UP, pygame.K_w):
                     up = False
+
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+
+                if event.button == 1:
+
+                    if player.get_number_of_blocks() > 0:
+
+                        new_block_x, new_block_y = None, None
+
+                        if player.get_direction() == 0:
+
+                            new_block_x = player.get_rect().left - constants.TILE_WIDTH
+
+                        else:
+
+                            new_block_x = player.get_rect().right
+
+                        new_block_y = player.get_rect().top
+
+                        new_block = classes.BaseBlock(new_block_x,
+                                                      new_block_y)
+
+                        if pygame.sprite.spritecollideany(new_block, tile_group):
+                            new_block.kill()
+                        else:
+                            tile_group.add(new_block)
+                            all_sprites.add(new_block)
 
         # обновление всех спрайтов
         all_sprites.update(left, right, up, tile_group)
 
+        for checkpoint in checkpoints_group:
+
+            if pygame.sprite.collide_rect(player, checkpoint):
+
+                if isinstance(checkpoint, classes.Checkpoint) and not checkpoint.get_is_on():
+                    player.set_to_go_coords(*checkpoint.get_coords())
+                    checkpoint.set_is_on()
+
         # отрисовка всех спрайтов
-        screen.fill('white')
-        # all_sprites.draw(screen)
+        screen.fill('black')
         camera.update(player)
         for sprite in all_sprites:
             screen.blit(sprite.image, camera.apply(sprite))
@@ -77,3 +120,4 @@ if __name__ == '__main__':
 
     # закрытие библиотеки pygame
     pygame.quit()
+    

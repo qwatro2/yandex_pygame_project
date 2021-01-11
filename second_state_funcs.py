@@ -4,7 +4,7 @@ import classes
 
 
 def generate_level(level_map: list, tile_group: pygame.sprite.Group, player_group: pygame.sprite.Group,
-                   all_sprites: pygame.sprite.Group) -> tuple:
+                   checkpoints_group: pygame.sprite.Group, all_sprites: pygame.sprite.Group) -> tuple:
     '''
 
     :param level_map: двумерный список - карта уровня
@@ -15,6 +15,7 @@ def generate_level(level_map: list, tile_group: pygame.sprite.Group, player_grou
     '''
 
     new_player, x, y = [None] * 3
+    player_x, player_y = None, None
 
     # циклом проходимся по всем элементам карты, создавая спрайты
     for y in range(len(level_map)):
@@ -30,8 +31,16 @@ def generate_level(level_map: list, tile_group: pygame.sprite.Group, player_grou
 
             elif level_map[y][x] == '2':
                 # TODO: добавить спрайт пустоты
-                new_player = classes.Player(x * constants.TILE_WIDTH, y * constants.TILE_HEIGHT, player_group,
-                                            all_sprites)
+                player_x = x
+                player_y = y
+
+            elif level_map[y][x] == '3':
+                # TODO: добавить спрайт пустоты
+                classes.Checkpoint(x * constants.TILE_WIDTH, y * constants.TILE_HEIGHT, checkpoints_group,
+                                   all_sprites)
+
+    new_player = classes.Player(player_x * constants.TILE_WIDTH, player_y * constants.TILE_HEIGHT, player_group,
+                                all_sprites)
 
     return new_player, x, y
 
