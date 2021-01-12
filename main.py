@@ -95,7 +95,7 @@ if __name__ == '__main__':
 
                             new_block_x = player.get_rect().right
 
-                        new_block_y = player.get_rect().top
+                        new_block_y = player.get_rect().top - constants.TILE_HEIGHT + constants.PLAYER_HEIGHT
 
                         new_block = classes.BaseBlock(new_block_x,
                                                       new_block_y)
