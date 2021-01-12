@@ -215,6 +215,9 @@ class Player(pygame.sprite.Sprite):
                 self.rwalk_number = 0
                 self.lwalk_number = 0
 
+        if self.immortality_timer > 0:
+            self.immortality_timer -= 1
+
     def collide(self, vx, vy, tile_group):
 
         for tile in tile_group:
@@ -244,6 +247,7 @@ class Player(pygame.sprite.Sprite):
         self.dead = True
         self.number_of_blocks = 5
         self.healthpoints = 2
+        self.immortality_timer = 40
         self.vx = 0
         self.vy = 0
 
@@ -266,14 +270,17 @@ class Player(pygame.sprite.Sprite):
     def take_damage(self):
         if not self.immortality:
             self.healthpoints -= 1
+
+            # DEGUB
+            print(self.healthpoints)
+
+            self.immortality = True
+            self.immortality_timer = 40
             if self.healthpoints == 0:
                 self.die()
                 return True
-            self.immortality = True
-            self.immortality_timer = 40
             return False
         else:
-            self.immortality_timer -= 1
             if self.immortality_timer == 0:
                 self.immortality = False
 
