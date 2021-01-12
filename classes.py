@@ -90,6 +90,8 @@ class Player(pygame.sprite.Sprite):
         self.number_of_blocks = 5
         self.direction = 1  # 1, если смотрим направо, иначе 0
         self.healthpoints = 2
+        self.immortality = False
+        self.immortality_timer = 0
 
         self.to_go_x = x
         self.to_go_y = y
@@ -241,6 +243,7 @@ class Player(pygame.sprite.Sprite):
     def die(self):
         self.dead = True
         self.number_of_blocks = 5
+        self.healthpoints = 2
         self.vx = 0
         self.vy = 0
 
@@ -261,7 +264,19 @@ class Player(pygame.sprite.Sprite):
         return self.direction
 
     def take_damage(self):
-        self
+        if not self.immortality:
+            self.healthpoints -= 1
+            if self.healthpoints == 0:
+                self.die()
+                return True
+            self.immortality = True
+            self.immortality_timer = 40
+            return False
+        else:
+            self.immortality_timer -= 1
+            if self.immortality_timer == 0:
+                self.immortality = False
+
 
 class BaseMonster(pygame.sprite.Sprite):
     image = first_state_funcs.load_image('base_monster.png', constants.MONSTER_WIDTH, constants.MONSTER_HEIGHT)

@@ -33,8 +33,7 @@ if __name__ == '__main__':
     level_map = first_state_funcs.load_level('test_level.txt')
     player, level_width, level_height = second_state_funcs.generate_level(level_map, tile_group, player_group,
                                                                           checkpoints_group, die_blocks_group,
-                                                                          new_blocks_group, monsters_group,
-                                                                          all_sprites)
+                                                                          monsters_group, all_sprites)
 
     # добавляем камеру
     camera = classes.Camera(second_state_funcs.camera_configure, (level_width + 1) * constants.TILE_WIDTH,
@@ -124,17 +123,19 @@ if __name__ == '__main__':
 
             if pygame.sprite.collide_rect(dieblock, player):
 
-                player.die()
-                for n_block in new_blocks_group:
-                    n_block.kill()
+                is_dead = player.take_damage()
+                if is_dead:
+                    for n_block in new_blocks_group:
+                        n_block.kill()
 
         for monster in monsters_group:
 
             if pygame.sprite.collide_rect(monster, player):
 
-                player.die()
-                for n_block in new_blocks_group:
-                    n_block.kill()
+                is_dead = player.take_damage()
+                if is_dead:
+                    for n_block in new_blocks_group:
+                        n_block.kill()
 
         # отрисовка всех спрайтов
         screen.fill('blue')
