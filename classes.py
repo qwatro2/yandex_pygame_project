@@ -52,11 +52,11 @@ class DieBlock(BaseBlock):
                     frame_location = (self.rect.w * i, self.rect.h * j)
                     frames.append(sheet.subsurface(pygame.Rect(
                         frame_location, self.rect.size)))
-                    if frames[-1].get_width() != constants.TILE_WIDTH + 100 or frames[
-                        -1].get_height() != constants.TILE_HEIGHT + 30:
+                    if frames[-1].get_width() != constants.TILE_WIDTH or frames[
+                        -1].get_height() != constants.TILE_HEIGHT:
                         frames[-1] = pygame.transform.scale(frames[-1],
-                                                            (constants.TILE_WIDTH + 100,
-                                                             constants.TILE_HEIGHT + 30))
+                                                            (constants.TILE_WIDTH,
+                                                             constants.TILE_HEIGHT))
         return frames
 
     def update(self):
@@ -127,8 +127,8 @@ class Player(pygame.sprite.Sprite):
     Класс Игрока.
     '''
 
-    rimage = first_state_funcs.load_image('Stone_Golem.png', constants.TILE_WIDTH, constants.TILE_HEIGHT)
-    limage = first_state_funcs.load_image('Stone_Golem-.png', constants.TILE_WIDTH, constants.TILE_HEIGHT)
+    rimage = first_state_funcs.load_image('Stone_Golem.png', constants.PLAYER_WIDTH, constants.PLAYER_HEIGHT)
+    limage = first_state_funcs.load_image('Stone_Golem-.png', constants.PLAYER_WIDTH, constants.PLAYER_HEIGHT)
 
     def __init__(self, x, y, *groups):
         super().__init__(*groups)
@@ -149,30 +149,30 @@ class Player(pygame.sprite.Sprite):
 
         self.rwalk = [
             first_state_funcs.load_image(f'Stone_Walking\Stone_Golem_Walking_{str(i).rjust(3, "0")}.png',
-                                         constants.TILE_WIDTH,
-                                         constants.TILE_HEIGHT) for i in range(24)]
+                                         constants.PLAYER_WIDTH,
+                                         constants.PLAYER_HEIGHT) for i in range(24)]
         self.rwalk_number = 0
         self.lwalk = [
             first_state_funcs.load_image(f'Stone_Walking\Stone_Golem_Walking_-{str(i).rjust(3, "0")}.png',
-                                         constants.TILE_WIDTH,
-                                         constants.TILE_HEIGHT) for i in range(24)]
+                                         constants.PLAYER_WIDTH,
+                                         constants.PLAYER_HEIGHT) for i in range(24)]
         self.lwalk_number = 0
 
-        self.rjump = first_state_funcs.load_image('Stone_Golem_Jumping_000.png', constants.TILE_WIDTH,
-                                                  constants.TILE_HEIGHT)
-        self.ljump = first_state_funcs.load_image('Stone_Golem_Jumping_-000.png', constants.TILE_WIDTH,
-                                                  constants.TILE_HEIGHT)
+        self.rjump = first_state_funcs.load_image('Stone_Golem_Jumping_000.png', constants.PLAYER_WIDTH,
+                                                  constants.PLAYER_HEIGHT)
+        self.ljump = first_state_funcs.load_image('Stone_Golem_Jumping_-000.png', constants.PLAYER_WIDTH,
+                                                  constants.PLAYER_HEIGHT)
 
         self.dead = False
         self.rdying = [
             first_state_funcs.load_image(f'Stone_Dying\Stone_Golem_Dying_{str(i).rjust(3, "0")}.png',
-                                         constants.TILE_WIDTH,
-                                         constants.TILE_HEIGHT) for i in range(15)]
+                                         constants.PLAYER_WIDTH,
+                                         constants.PLAYER_HEIGHT) for i in range(15)]
         self.rdying_number = 0
         self.ldying = [
             first_state_funcs.load_image(f'Stone_Dying\Stone_Golem_Dying_-{str(i).rjust(3, "0")}.png',
-                                         constants.TILE_WIDTH,
-                                         constants.TILE_HEIGHT) for i in range(15)]
+                                         constants.PLAYER_WIDTH,
+                                         constants.PLAYER_HEIGHT) for i in range(15)]
         self.ldying_number = 0
 
     def update(self, left, right, up, tile_group):
@@ -281,6 +281,65 @@ class Player(pygame.sprite.Sprite):
 
     def get_direction(self):
         return self.direction
+
+
+class BaseMonster(pygame.sprite.Sprite):
+
+    def __init__(self, x, y, vx, vy, max_left, max_up, *groups):
+        super().__init__(*groups)
+        self.rwalk = [
+            first_state_funcs.load_image(f'Enemy_Walking\Enemy_Walking_{str(i).rjust(3, "0")}.png',
+                                         constants.PLAYER_WIDTH,
+                                         constants.PLAYER_HEIGHT) for i in range(18)]
+        self.rwalk_number = 0
+        self.lwalk = [
+            first_state_funcs.load_image(f'Enemy_Walking\Enemy_Walking_-{str(i).rjust(3, "0")}.png',
+                                         constants.PLAYER_WIDTH,
+                                         constants.PLAYER_HEIGHT) for i in range(18)]
+        self.lwalk_number = 0
+        self.image = self.rwalk[0]
+        self.rect = self.image.get_rect()
+        self.rect.left = x
+        self.rect.top = y
+        self.start_x = x
+        self.start_y = y
+        self.vx = vx
+        self.vy = vy
+        self.max_left = max_left
+        self.max_up = max_up
+
+    def update(self, platforms):
+        self.rect.y += self.vy
+        self.rect.x += self.vx
+
+        self.collide(platforms)
+
+        if abs(self.start_x - self.rect.x) > self.max_left:
+            self.vx = -self.vx
+
+        if abs(self.start_y - self.rect.y) > self.max_up:
+            self.vy = -self.vy
+        if self.vx < 0:
+            self.rwalk_number = 0
+            self.image = self.lwalk[self.lwalk_number]
+            self.lwalk_number += 1
+            self.lwalk_number %= len(self.lwalk)
+        elif self.vx > 0:
+            self.lwalk_number = 0
+            self.image = self.rwalk[self.rwalk_number]
+            self.rwalk_number += 1
+            self.rwalk_number %= len(self.rwalk)
+
+    def collide(self, platforms):
+
+        for platform in platforms:
+
+            if pygame.sprite.collide_rect(self, platform) and self != platform:
+                self.vx *= -1
+                self.vy *= -1
+
+    def get_rect(self):
+        return self.rect
 
 
 class Camera:
