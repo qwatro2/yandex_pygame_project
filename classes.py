@@ -33,7 +33,10 @@ class DieBlock(BaseBlock):
 
     def __init__(self, x, y, *groups):
         super().__init__(x, y, *groups)
-        self.image = DieBlock.image
+        sheet = first_state_funcs.load_image('12_nebula_spritesheet.png', 800, 800)
+        self.frames = self.cut_sheet(sheet, 8, 8)
+        self.cur_frame = 0
+        self.image = self.frames[self.cur_frame]
         self.rect = self.image.get_rect()
         self.rect.left = x
         self.rect.top = y
@@ -41,12 +44,33 @@ class DieBlock(BaseBlock):
     def get_rect(self):
         return self.rect
 
+    def cut_sheet(self, sheet, columns, rows):
+        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
+                                sheet.get_height() // rows)
+        frames = []
+        for j in range(rows):
+            for i in range(columns):
+                if i + j < 10:
+                    frame_location = (self.rect.w * i, self.rect.h * j)
+                    frames.append(sheet.subsurface(pygame.Rect(
+                        frame_location, self.rect.size)))
+                    if frames[-1].get_width() != constants.TILE_WIDTH + 100 or frames[
+                        -1].get_height() != constants.TILE_HEIGHT + 30:
+                        frames[-1] = pygame.transform.scale(frames[-1],
+                                                            (constants.TILE_WIDTH + 100,
+                                                             constants.TILE_HEIGHT + 30))
+        return frames
+
+    def update(self):
+        self.cur_frame += 1
+        self.cur_frame %= len(self.frames)
+        self.image = self.frames[self.cur_frame]
+
 
 class Checkpoint(pygame.sprite.Sprite):
     '''
     Класс Чекпоинта.
     '''
-
 
     def __init__(self, x, y, *groups):
         super().__init__(*groups)
@@ -94,7 +118,7 @@ class Checkpoint(pygame.sprite.Sprite):
     def get_coords(self):
         return self.rect.left, self.rect.top
 
-    def animation(self):
+    def update(self):
         self.cur_frame += 1
         self.cur_frame %= len(self.frames)
         self.image = self.frames[self.cur_frame]

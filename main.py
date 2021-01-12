@@ -97,19 +97,20 @@ if __name__ == '__main__':
                             new_blocks_group.add(new_block)
 
         # обновление всех спрайтов
-        all_sprites.update(left, right, up, tile_group)
+        player_group.update(left, right, up, tile_group)
         for checkpoint in checkpoints_group:
             if pygame.sprite.collide_rect(player, checkpoint):
 
                 if isinstance(checkpoint, classes.Checkpoint) and not checkpoint.get_is_on():
                     player.set_to_go_coords(*checkpoint.get_coords())
                     checkpoint.set_is_on()
-            checkpoint.animation()
         if pygame.sprite.spritecollideany(player, die_blocks_group):
             player.die()
 
             for n_block in new_blocks_group:
                 n_block.kill()
+        checkpoints_group.update()
+        die_blocks_group.update()
         # отрисовка всех спрайтов
         screen.fill('white')
         camera.update(player)
