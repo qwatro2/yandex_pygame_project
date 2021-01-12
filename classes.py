@@ -241,6 +241,8 @@ class Player(pygame.sprite.Sprite):
                     self.image = Player.limage
                 self.rwalk_number = 0
                 self.lwalk_number = 0
+        if self.immortality_timer > 0:
+            self.immortality_timer -= 1
 
     def collide(self, vx, vy, tile_group):
         for tile in tile_group:

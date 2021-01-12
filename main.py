@@ -41,14 +41,14 @@ if __name__ == '__main__':
                             (level_height + 1) * constants.TILE_HEIGHT)
 
     # игровой цикл
-    is_death = False
+    is_dead = False
     x = 0
     while game_loop:
-        if is_death:
+        if is_dead:
             x += 1
         if x > 22:
             x = 0
-            is_death = False
+            is_dead = False
             sound_death.stop()
 
         # обработка событий
@@ -118,21 +118,21 @@ if __name__ == '__main__':
                     player.set_to_go_coords(*checkpoint.get_coords())
                     checkpoint.set_is_on()
         if pygame.sprite.spritecollideany(player, die_blocks_group):
-            player.die()
-            sound_death.play()
-            is_death = True
+            is_dead = player.take_damage()
+            if is_dead:
+                for n_block in new_blocks_group:
+                    n_block.kill()
+                sound_death.play()
 
-            for n_block in new_blocks_group:
-                n_block.kill()
         for monster in monsters_group:
 
             if pygame.sprite.collide_rect(monster, player):
 
-                player.die()
-                sound_death.play()
-                is_death = True
-                for n_block in new_blocks_group:
-                    n_block.kill()
+                is_dead = player.take_damage()
+                if is_dead:
+                    for n_block in new_blocks_group:
+                        n_block.kill()
+                    sound_death.play()
         checkpoints_group.update()
         die_blocks_group.update()
         # отрисовка всех спрайтов
