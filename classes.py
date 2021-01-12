@@ -89,6 +89,7 @@ class Player(pygame.sprite.Sprite):
 
         self.number_of_blocks = 5
         self.direction = 1  # 1, если смотрим направо, иначе 0
+        self.healthpoints = 2
 
         self.to_go_x = x
         self.to_go_y = y
@@ -259,6 +260,8 @@ class Player(pygame.sprite.Sprite):
     def get_direction(self):
         return self.direction
 
+    def take_damage(self):
+        self
 
 class BaseMonster(pygame.sprite.Sprite):
     image = first_state_funcs.load_image('base_monster.png', constants.MONSTER_WIDTH, constants.MONSTER_HEIGHT)
