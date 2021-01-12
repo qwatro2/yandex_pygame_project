@@ -94,14 +94,14 @@ if __name__ == '__main__':
         # обновление всех спрайтов
         all_sprites.update(left, right, up, tile_group)
         for checkpoint in checkpoints_group:
-
             if pygame.sprite.collide_rect(player, checkpoint):
 
                 if isinstance(checkpoint, classes.Checkpoint) and not checkpoint.get_is_on():
                     player.set_to_go_coords(*checkpoint.get_coords())
                     checkpoint.set_is_on()
+            checkpoint.animation()
         # отрисовка всех спрайтов
-        screen.fill('brown')
+        screen.fill('white')
         camera.update(player)
         for sprite in all_sprites:
             screen.blit(sprite.image, camera.apply(sprite))
