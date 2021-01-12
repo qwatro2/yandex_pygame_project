@@ -288,7 +288,7 @@ class Player(pygame.sprite.Sprite):
 class BaseMonster(pygame.sprite.Sprite):
     image = first_state_funcs.load_image('base_monster.png', constants.MONSTER_WIDTH, constants.MONSTER_HEIGHT)
 
-    def __init__(self, x, y, vx, vy, max_left, max_up, *groups):
+    def __init__(self, x, y, vx, max_left, *groups):
         super().__init__(*groups)
         self.image = BaseMonster.image
         self.rect = self.image.get_rect()
@@ -297,29 +297,42 @@ class BaseMonster(pygame.sprite.Sprite):
         self.start_x = x
         self.start_y = y
         self.vx = vx
-        self.vy = vy
+        self.vy = 0
         self.max_left = max_left
-        self.max_up = max_up
+        self.on_ground = True
 
     def update(self, platforms):
-        self.rect.y += self.vy
         self.rect.x += self.vx
+        self.collide(self.vx, 0, platforms)
 
-        self.collide(platforms)
+        if not self.on_ground:
+            self.vy += constants.GRAVITY
+
+        self.on_ground = False
+        self.rect.y += self.vy
+        self.collide(0, self.vy, platforms)
 
         if abs(self.start_x - self.rect.x) > self.max_left:
             self.vx = -self.vx
 
-        if abs(self.start_y - self.rect.y) > self.max_up:
-            self.vy = -self.vy
-
-    def collide(self, platforms):
+    def collide(self, vx, vy, platforms):
 
         for platform in platforms:
 
             if pygame.sprite.collide_rect(self, platform) and self != platform:
-                self.vx = -self.vx
-                self.vy = -self.vy
+
+                if vx > 0:
+                    self.rect.right = platform.get_rect().left
+                    self.vx = -vx
+
+                if vx < 0:
+                    self.rect.left = platform.get_rect().right
+                    self.vx = -vx
+
+                if vy > 0:
+                    self.rect.bottom = platform.get_rect().top
+                    self.on_ground = True
+                    self.vy = 0
 
     def get_rect(self):
         return self.rect
