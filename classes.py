@@ -260,6 +260,46 @@ class Player(pygame.sprite.Sprite):
         return self.direction
 
 
+class BaseMonster(pygame.sprite.Sprite):
+    image = first_state_funcs.load_image('base_monster.png', constants.MONSTER_WIDTH, constants.MONSTER_HEIGHT)
+
+    def __init__(self, x, y, vx, vy, max_left, max_up, *groups):
+        super().__init__(*groups)
+        self.image = BaseMonster.image
+        self.rect = self.image.get_rect()
+        self.rect.left = x
+        self.rect.top = y
+        self.start_x = x
+        self.start_y = y
+        self.vx = vx
+        self.vy = vy
+        self.max_left = max_left
+        self.max_up = max_up
+
+    def update(self, platforms):
+        self.rect.y += self.vy
+        self.rect.x += self.vx
+
+        self.collide(platforms)
+
+        if abs(self.start_x - self.rect.x) > self.max_left:
+            self.vx = -self.vx
+
+        if abs(self.start_y - self.rect.y) > self.max_up:
+            self.vy = -self.vy
+
+    def collide(self, platforms):
+
+        for platform in platforms:
+
+            if pygame.sprite.collide_rect(self, platform) and self != platform:
+                self.vx = -self.vx
+                self.vy = -self.vy
+
+    def get_rect(self):
+        return self.rect
+
+
 class Camera:
     def __init__(self, camera_func, width, height):
         self.camera_func = camera_func

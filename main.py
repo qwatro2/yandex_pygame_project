@@ -15,12 +15,15 @@ if __name__ == '__main__':
     pygame.mixer.music.load('data\music\Toccata_et_Fugue.ogg')
     pygame.mixer.music.play(-1)
     clock = pygame.time.Clock()
+
     all_sprites = pygame.sprite.Group()
     checkpoints_group = pygame.sprite.Group()
     new_blocks_group = pygame.sprite.Group()
     die_blocks_group = pygame.sprite.Group()
     tile_group = pygame.sprite.Group()
+    monsters_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
+
     left, right, up = [False] * 3
 
     # TODO: изменить заголовок и иконку игры
@@ -30,6 +33,7 @@ if __name__ == '__main__':
     level_map = first_state_funcs.load_level('test_level.txt')
     player, level_width, level_height = second_state_funcs.generate_level(level_map, tile_group, player_group,
                                                                           checkpoints_group, die_blocks_group,
+                                                                          new_blocks_group, monsters_group,
                                                                           all_sprites)
 
     # добавляем камеру
@@ -105,7 +109,8 @@ if __name__ == '__main__':
                             new_blocks_group.add(new_block)
 
         # обновление всех спрайтов
-        all_sprites.update(left, right, up, tile_group)
+        player_group.update(left, right, up, tile_group)
+        monsters_group.update(tile_group)
 
         for checkpoint in checkpoints_group:
 
@@ -115,11 +120,21 @@ if __name__ == '__main__':
                     player.set_to_go_coords(*checkpoint.get_coords())
                     checkpoint.set_is_on()
 
-        if pygame.sprite.spritecollideany(player, die_blocks_group):
-            player.die()
+        for dieblock in die_blocks_group:
 
-            for n_block in new_blocks_group:
-                n_block.kill()
+            if pygame.sprite.collide_rect(dieblock, player):
+
+                player.die()
+                for n_block in new_blocks_group:
+                    n_block.kill()
+
+        for monster in monsters_group:
+
+            if pygame.sprite.collide_rect(monster, player):
+
+                player.die()
+                for n_block in new_blocks_group:
+                    n_block.kill()
 
         # отрисовка всех спрайтов
         screen.fill('blue')
