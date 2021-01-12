@@ -19,6 +19,8 @@ if __name__ == '__main__':
     tile_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
     checkpoints_group = pygame.sprite.Group()
+    new_blocks_group = pygame.sprite.Group()
+    die_blocks_group = pygame.sprite.Group()
     left, right, up = [False] * 3
 
     # TODO: изменить заголовок и иконку игры
@@ -27,7 +29,8 @@ if __name__ == '__main__':
     # генерация уровня
     level_map = first_state_funcs.load_level('test_level.txt')
     player, level_width, level_height = second_state_funcs.generate_level(level_map, tile_group, player_group,
-                                                                          checkpoints_group, all_sprites)
+                                                                          checkpoints_group, die_blocks_group,
+                                                                          all_sprites)
 
     # добавляем камеру
     camera = classes.Camera(second_state_funcs.camera_configure, (level_width + 1) * constants.TILE_WIDTH,
@@ -88,8 +91,10 @@ if __name__ == '__main__':
                         if pygame.sprite.spritecollideany(new_block, tile_group):
                             new_block.kill()
                         else:
+                            player.add_number_of_blocks(-1)
                             tile_group.add(new_block)
                             all_sprites.add(new_block)
+                            new_blocks_group.add(new_block)
 
         # обновление всех спрайтов
         all_sprites.update(left, right, up, tile_group)
@@ -100,6 +105,11 @@ if __name__ == '__main__':
                     player.set_to_go_coords(*checkpoint.get_coords())
                     checkpoint.set_is_on()
             checkpoint.animation()
+        if pygame.sprite.spritecollideany(player, die_blocks_group):
+            player.die()
+
+            for n_block in new_blocks_group:
+                n_block.kill()
         # отрисовка всех спрайтов
         screen.fill('white')
         camera.update(player)

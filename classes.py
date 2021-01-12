@@ -23,16 +23,30 @@ class BaseBlock(pygame.sprite.Sprite):
         return self.rect
 
 
+class DieBlock(BaseBlock):
+    '''
+    Класс Блока Ловушки.
+    При коллайде с ним, герой получает урон.
+    '''
+
+    image = first_state_funcs.load_image('die_block.png', constants.TILE_WIDTH, constants.TILE_HEIGHT)
+
+    def __init__(self, x, y, *groups):
+        super().__init__(x, y, *groups)
+        self.image = DieBlock.image
+        self.rect = self.image.get_rect()
+        self.rect.left = x
+        self.rect.top = y
+
+    def get_rect(self):
+        return self.rect
+
+
 class Checkpoint(pygame.sprite.Sprite):
     '''
     Класс Чекпоинта.
     '''
 
-    image_off = first_state_funcs.load_image('base_checkpoint_off.png', constants.CHECKPOINT_WIDTH,
-                                             constants.CHECKPOINT_HEIGHT)
-
-    image_on = first_state_funcs.load_image('base_checkpoint_on.png', constants.CHECKPOINT_WIDTH,
-                                            constants.CHECKPOINT_HEIGHT)
 
     def __init__(self, x, y, *groups):
         super().__init__(*groups)

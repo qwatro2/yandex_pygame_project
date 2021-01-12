@@ -4,7 +4,8 @@ import classes
 
 
 def generate_level(level_map: list, tile_group: pygame.sprite.Group, player_group: pygame.sprite.Group,
-                   checkpoints_group: pygame.sprite.Group, all_sprites: pygame.sprite.Group) -> tuple:
+                   checkpoints_group: pygame.sprite.Group, die_blocks_group: pygame.sprite.Group,
+                   all_sprites: pygame.sprite.Group) -> tuple:
     '''
     :param level_map: двумерный список - карта уровня
     :param tile_group: группа тайлов
@@ -37,6 +38,9 @@ def generate_level(level_map: list, tile_group: pygame.sprite.Group, player_grou
                 # TODO: добавить спрайт пустоты
                 classes.Checkpoint(x * constants.TILE_WIDTH, y * constants.TILE_HEIGHT, checkpoints_group,
                                    all_sprites)
+
+            elif level_map[y][x] == '4':
+                classes.DieBlock(x * constants.TILE_WIDTH, y * constants.TILE_HEIGHT, die_blocks_group, all_sprites)
 
     new_player = classes.Player(player_x * constants.TILE_WIDTH, player_y * constants.TILE_HEIGHT, player_group,
                                 all_sprites)
