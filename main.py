@@ -14,6 +14,8 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
     pygame.mixer.music.load('data\music\Toccata_et_Fugue.ogg')
     pygame.mixer.music.play(-1)
+    sound_death = pygame.mixer.Sound('data\music\death.ogg')
+    sound_death.set_volume(0.5)
     clock = pygame.time.Clock()
     all_sprites = pygame.sprite.Group()
     tile_group = pygame.sprite.Group()
@@ -37,7 +39,15 @@ if __name__ == '__main__':
                             (level_height + 1) * constants.TILE_HEIGHT)
 
     # игровой цикл
+    is_death = False
+    x = 0
     while game_loop:
+        if is_death:
+            x += 1
+        if x > 22:
+            x = 0
+            is_death = False
+            sound_death.stop()
 
         # обработка событий
         for event in pygame.event.get():
@@ -106,6 +116,8 @@ if __name__ == '__main__':
                     checkpoint.set_is_on()
         if pygame.sprite.spritecollideany(player, die_blocks_group):
             player.die()
+            sound_death.play()
+            is_death = True
 
             for n_block in new_blocks_group:
                 n_block.kill()

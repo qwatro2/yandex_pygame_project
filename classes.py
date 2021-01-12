@@ -29,8 +29,6 @@ class DieBlock(BaseBlock):
     При коллайде с ним, герой получает урон.
     '''
 
-    image = first_state_funcs.load_image('die_block.png', constants.TILE_WIDTH, constants.TILE_HEIGHT)
-
     def __init__(self, x, y, *groups):
         super().__init__(x, y, *groups)
         sheet = first_state_funcs.load_image('12_nebula_spritesheet.png', 800, 800)
