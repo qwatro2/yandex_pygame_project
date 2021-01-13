@@ -394,13 +394,13 @@ class BaseMonster(pygame.sprite.Sprite):
         super().__init__(*groups)
         self.rwalk = [
             first_state_funcs.load_image(f'Enemy_Walking\Enemy_Walking_{str(i).rjust(3, "0")}.png',
-                                         constants.PLAYER_WIDTH,
-                                         constants.PLAYER_HEIGHT) for i in range(18)]
+                                         constants.PLAYER_WIDTH*hp//2,
+                                         constants.PLAYER_HEIGHT*hp//2) for i in range(18)]
         self.rwalk_number = 0
         self.lwalk = [
             first_state_funcs.load_image(f'Enemy_Walking\Enemy_Walking_-{str(i).rjust(3, "0")}.png',
-                                         constants.PLAYER_WIDTH,
-                                         constants.PLAYER_HEIGHT) for i in range(18)]
+                                         constants.PLAYER_WIDTH*hp//2,
+                                         constants.PLAYER_HEIGHT*hp//2) for i in range(18)]
         self.lwalk_number = 0
         self.image = self.rwalk[0]
         self.rect = self.image.get_rect()
