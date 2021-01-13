@@ -36,18 +36,27 @@ def load_image(filename: str, width: int, height: int, colorkey=None) -> pygame.
     return image
 
 
-def load_level(filename: str) -> list:
-    '''
-
-    :param filename: имя файла в папке
-    :return: двумерный список, который представляет собой карту уровня
-    '''
-
-    # получаем полный путь к файлу
+def load_level(filename: str) -> dict:
     fullname = f'data/levels/{filename}'
 
     # читаем карту уровня из файла
     with open(fullname, 'r') as file:
-        level_map = list(map(lambda x: list(x.rstrip('\n')), file.readlines()))
+        all_info = list(map(lambda x: x.rstrip('\n'), file.readlines()))
 
-    return level_map
+    separator_index = all_info.index('')
+    level_map = all_info[:separator_index]
+    entities = []
+    for line in all_info[separator_index + 1:]:
+        line_data = line.split()
+        dict_data = {'name': line_data[0]}
+        for data in line_data[1:]:
+            key, value = data.split(':')
+            dict_data[key] = int(value)
+        entities.append(dict_data)
+
+    res = {
+        'map': level_map,
+        'entities': entities
+    }
+
+    return res

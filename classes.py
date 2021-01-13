@@ -373,7 +373,7 @@ class BaseMonster(pygame.sprite.Sprite):
         self.max_left = max_left
         self.on_ground = True
 
-        self.healthpoints = 2
+        self.healthpoints = 1
         self.immortality = False
         self.immortality_timer = 0
 
