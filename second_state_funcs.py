@@ -7,7 +7,6 @@ def generate_level(level_map: list, tile_group: pygame.sprite.Group, player_grou
                    checkpoints_group: pygame.sprite.Group, die_blocks_group: pygame.sprite.Group,
                    monsters_group: pygame.sprite.Group, all_sprites: pygame.sprite.Group) -> tuple:
     '''
-
     :param level_map: двумерный список - карта уровня
     :param tile_group: группа тайлов
     :param player_group: группа игрока
