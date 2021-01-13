@@ -3,53 +3,31 @@ import constants
 import classes
 
 
-def generate_level(level_map: list, tile_group: pygame.sprite.Group, player_group: pygame.sprite.Group,
-                   checkpoints_group: pygame.sprite.Group, die_blocks_group: pygame.sprite.Group,
-                   monsters_group: pygame.sprite.Group, all_sprites: pygame.sprite.Group) -> tuple:
-    '''
-    :param level_map: двумерный список - карта уровня
-    :param tile_group: группа тайлов
-    :param player_group: группа игрока
-    :param all_sprites: группа всех спрайтов
-    :return: экземпляр класса classes.Player, ширину и высоту уровня
-    '''
-
+def generate_level(level_map: list, entities: list, sprite_groups: dict) -> tuple:
     new_player, x, y = [None] * 3
-    player_x, player_y = None, None
 
-    # циклом проходимся по всем элементам карты, создавая спрайты
     for y in range(len(level_map)):
-
         for x in range(len(level_map[y])):
-
-            if level_map[y][x] == '1':
-                classes.BaseBlock(x * constants.TILE_WIDTH, y * constants.TILE_HEIGHT, tile_group, all_sprites)
-
-            elif level_map[y][x] == '0':
-                # TODO: добавить спрайт пустоты
+            if level_map[y][x] == '0':
+                # TODO: спрайт пустоты
                 pass
-
+            elif level_map[y][x] == '1':
+                classes.BaseBlock(x * constants.TILE_WIDTH, y * constants.TILE_HEIGHT,
+                                  sprite_groups['tiles'], sprite_groups['all'])
             elif level_map[y][x] == '2':
-                # TODO: добавить спрайт пустоты
-                player_x = x
-                player_y = y
+                classes.DieBlock(x * constants.TILE_WIDTH, y * constants.TILE_HEIGHT,
+                                 sprite_groups['traps'], sprite_groups['all'])
 
-            elif level_map[y][x] == '3':
-                # TODO: добавить спрайт пустоты
-                classes.Checkpoint(x * constants.TILE_WIDTH, y * constants.TILE_HEIGHT, checkpoints_group,
-                                   all_sprites)
-
-            elif level_map[y][x] == '4':
-                classes.DieBlock(x * constants.TILE_WIDTH, y * constants.TILE_HEIGHT, die_blocks_group,
-                                 all_sprites)
-
-            elif level_map[y][x] == '5':
-                classes.BaseMonster(x * constants.TILE_WIDTH, y * constants.TILE_HEIGHT,
-                                    constants.MONSTER_SPEED_X, constants.TILE_WIDTH * 5,
-                                    monsters_group, all_sprites)
-
-    new_player = classes.Player(player_x * constants.TILE_WIDTH, player_y * constants.TILE_HEIGHT,
-                                player_group, all_sprites)
+    for entity in entities:
+        if entity['name'] == 'player':
+            new_player = classes.Player(entity['x'], entity['y'], entity['hp'], entity['blocks'],
+                                        sprite_groups['player'], sprite_groups['all'])
+        elif entity['name'] == 'enemy':
+            classes.BaseMonster(entity['x'], entity['y'], entity['v'], entity['max'], entity['hp'],
+                                sprite_groups['monsters'], sprite_groups['all'])
+        elif entity['name'] == 'checkpoint':
+            classes.Checkpoint(entity['x'], entity['y'], entity['id'],
+                               sprite_groups['checkpoints'], sprite_groups['all'])
 
     return new_player, x, y
 

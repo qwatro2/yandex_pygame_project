@@ -17,24 +17,31 @@ if __name__ == '__main__':
     sound_death = pygame.mixer.Sound('data\music\death.ogg')
     sound_death.set_volume(0.5)
     clock = pygame.time.Clock()
+
     all_sprites = pygame.sprite.Group()
     tile_group = pygame.sprite.Group()
+    die_blocks_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
+    monsters_group = pygame.sprite.Group()
     checkpoints_group = pygame.sprite.Group()
     new_blocks_group = pygame.sprite.Group()
-    die_blocks_group = pygame.sprite.Group()
-    monsters_group = pygame.sprite.Group()
+
     left, right, up = [False] * 3
 
     # TODO: изменить заголовок и иконку игры
     pygame.display.set_caption('caption')
 
     # генерация уровня
-    level_map = first_state_funcs.load_level('test_level.txt')
-    player, level_width, level_height = second_state_funcs.generate_level(level_map, tile_group, player_group,
-                                                                          checkpoints_group, die_blocks_group,
-                                                                          monsters_group,
-                                                                          all_sprites)
+    level_map, entities = first_state_funcs.load_level('test_level.txt').values()
+    sprite_groups = {
+        'all': all_sprites,
+        'tiles': tile_group,
+        'traps': die_blocks_group,
+        'player': player_group,
+        'monsters': monsters_group,
+        'checkpoints': checkpoints_group
+    }
+    player, level_width, level_height = second_state_funcs.generate_level(level_map, entities, sprite_groups)
 
     # добавляем камеру
     camera = classes.Camera(second_state_funcs.camera_configure, (level_width + 1) * constants.TILE_WIDTH,
