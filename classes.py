@@ -73,7 +73,7 @@ class Checkpoint(pygame.sprite.Sprite):
     def __init__(self, x, y, *groups):
         super().__init__(*groups)
         sheet = first_state_funcs.load_image('11_fire_spritesheet.png', 800, 800)
-        self.frames = self.cut_sheet(sheet, 8, 8)
+        self.frames = self.cut_sheet(sheet, 8, 8, 43, 20)
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
         self.rect = self.image.get_rect()
@@ -83,21 +83,21 @@ class Checkpoint(pygame.sprite.Sprite):
         self.y = y
         self.is_on = False
 
-    def cut_sheet(self, sheet, columns, rows):
+    def cut_sheet(self, sheet, columns, rows, width, height):
         self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
                                 sheet.get_height() // rows)
         frames = []
         for j in range(rows):
             for i in range(columns):
                 if i + j < 10:
-                    frame_location = (self.rect.w * i, self.rect.h * j)
+                    frame_location = (self.rect.w * i + width, self.rect.h * j + height)
                     frames.append(sheet.subsurface(pygame.Rect(
-                        frame_location, self.rect.size)))
-                    if frames[-1].get_width() != constants.TILE_WIDTH + 100 or frames[
-                        -1].get_height() != constants.TILE_HEIGHT + 30:
+                        frame_location, (self.rect.size[0] - width, self.rect.size[1] - height))))
+                    if frames[-1].get_width() != constants.TILE_WIDTH or frames[
+                        -1].get_height() != constants.TILE_HEIGHT:
                         frames[-1] = pygame.transform.scale(frames[-1],
-                                                            (constants.TILE_WIDTH + 100,
-                                                             constants.TILE_HEIGHT + 30))
+                                                            (constants.TILE_WIDTH,
+                                                             constants.TILE_HEIGHT))
         return frames
 
     def get_is_on(self):
@@ -106,7 +106,7 @@ class Checkpoint(pygame.sprite.Sprite):
     def set_is_on(self):
         self.is_on = True
         sheet = first_state_funcs.load_image('16_sunburn_spritesheet.png', 800, 800)
-        self.frames = self.cut_sheet(sheet, 8, 8)
+        self.frames = self.cut_sheet(sheet, 8, 8, 25, 25)
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
         self.rect = self.image.get_rect()
@@ -326,18 +326,21 @@ class BaseMonster(pygame.sprite.Sprite):
         self.vy = vy
         self.max_left = max_left
         self.max_up = max_up
+        self.on_ground = True
 
     def update(self, platforms):
-        self.rect.y += self.vy
         self.rect.x += self.vx
+        self.collide(self.vx, 0, platforms)
 
-        self.collide(platforms)
+        if not self.on_ground:
+            self.vy += constants.GRAVITY
+
+        self.on_ground = False
+        self.rect.y += self.vy
+        self.collide(0, self.vy, platforms)
 
         if abs(self.start_x - self.rect.x) > self.max_left:
             self.vx = -self.vx
-
-        if abs(self.start_y - self.rect.y) > self.max_up:
-            self.vy = -self.vy
         if self.vx < 0:
             self.rwalk_number = 0
             self.image = self.lwalk[self.lwalk_number]
@@ -349,13 +352,24 @@ class BaseMonster(pygame.sprite.Sprite):
             self.rwalk_number += 1
             self.rwalk_number %= len(self.rwalk)
 
-    def collide(self, platforms):
+    def collide(self, vx, vy, platforms):
 
         for platform in platforms:
 
             if pygame.sprite.collide_rect(self, platform) and self != platform:
-                self.vx *= -1
-                self.vy *= -1
+
+                if vx > 0:
+                    self.rect.right = platform.get_rect().left
+                    self.vx = -vx
+
+                if vx < 0:
+                    self.rect.left = platform.get_rect().right
+                    self.vx = -vx
+
+                if vy > 0:
+                    self.rect.bottom = platform.get_rect().top
+                    self.on_ground = True
+                    self.vy = 0
 
     def get_rect(self):
         return self.rect
