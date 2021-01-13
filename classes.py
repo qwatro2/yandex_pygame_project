@@ -305,10 +305,6 @@ class Player(pygame.sprite.Sprite):
     def take_damage(self):
         if not self.immortality:
             self.healthpoints -= 1
-
-            # DEBUG
-            print(self.healthpoints)
-
             self.immortality = True
             self.immortality_timer = 40
             if self.healthpoints == 0:
@@ -326,14 +322,9 @@ class Player(pygame.sprite.Sprite):
                                   s_rect.w // 2,
                                   s_rect.h)
 
-        res = []
-
         for monster in monsters:
             if isinstance(monster, BaseMonster) and damage_rect.colliderect(monster.get_rect()):
-                if monster.take_damage():
-                    res.append(monster)
-
-        return res
+                monster.take_damage()
 
 
 class BaseMonster(pygame.sprite.Sprite):

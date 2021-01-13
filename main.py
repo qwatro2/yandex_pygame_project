@@ -26,7 +26,6 @@ if __name__ == '__main__':
     checkpoints_group = pygame.sprite.Group()
 
     new_blocks_group = pygame.sprite.Group()
-    killed_monsters_group = pygame.sprite.Group()
 
     hearth_image = first_state_funcs.load_image('hearth.png', constants.TILE_WIDTH // 2, constants.TILE_HEIGHT // 2)
 
@@ -81,6 +80,10 @@ if __name__ == '__main__':
 
                 if event.key == pygame.K_0:
                     player.die()
+                    for n_block in new_blocks_group:
+                        n_block.kill()
+
+                    sound_death.play()
 
             elif event.type == pygame.KEYUP:
 
@@ -124,11 +127,7 @@ if __name__ == '__main__':
 
                 elif event.button == 1:
 
-                    res = player.deal_damage(monsters_group)
-
-                    for monster in res:
-                        killed_monsters_group.add(monster)
-                        monsters_group.remove(monster)
+                    player.deal_damage(monsters_group)
 
         # обновление всех спрайтов
         player_group.update(left, right, up, tile_group)
@@ -144,18 +143,12 @@ if __name__ == '__main__':
                     player.set_refresh_blocks_number(player.get_number_of_blocks())
                     new_blocks_group.empty()
 
-                    killed_monsters_group.empty()
-
         if pygame.sprite.spritecollideany(player, die_blocks_group):
             is_dead = player.take_damage()
             if is_dead:
 
                 for n_block in new_blocks_group:
                     n_block.kill()
-
-                for monster in killed_monsters_group:
-                    monsters_group.add(monster)
-                    killed_monsters_group.remove(monster)
 
                 sound_death.play()
 
