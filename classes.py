@@ -4,6 +4,14 @@ import constants
 import first_state_funcs
 
 
+class Background(pygame.sprite.Sprite):
+    def __init__(self, image_file, location):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = first_state_funcs.load_image(image_file, constants.WIDTH, constants.HEIGHT)
+        self.rect = self.image.get_rect()
+        self.rect.left, self.rect.top = location
+
+
 class BaseBlock(pygame.sprite.Sprite):
     '''
     Класс Базового Блока.

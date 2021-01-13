@@ -12,7 +12,8 @@ if __name__ == '__main__':
     # инициализация констант игры
     game_loop = True
     screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
-    pygame.mixer.music.load('data\music\Toccata_et_Fugue.ogg')
+    background = classes.Background('image_background.png', [0, 0])
+    pygame.mixer.music.load('data\music\music_background.wav')
     pygame.mixer.music.play(-1)
     sound_death = pygame.mixer.Sound('data\music\death.ogg')
     sound_death.set_volume(0.5)
@@ -157,7 +158,8 @@ if __name__ == '__main__':
         checkpoints_group.update()
         die_blocks_group.update()
         # отрисовка всех спрайтов
-        screen.fill('white')
+        screen.fill([255, 255, 255])
+        screen.blit(background.image, background.rect)
         camera.update(player)
         for sprite in all_sprites:
             screen.blit(sprite.image, camera.apply(sprite))
