@@ -24,7 +24,9 @@ if __name__ == '__main__':
     player_group = pygame.sprite.Group()
     monsters_group = pygame.sprite.Group()
     checkpoints_group = pygame.sprite.Group()
+
     new_blocks_group = pygame.sprite.Group()
+    killed_monsters_group = pygame.sprite.Group()
 
     left, right, up = [False] * 3
 
@@ -75,6 +77,9 @@ if __name__ == '__main__':
                 if event.key in (pygame.K_SPACE, pygame.K_UP, pygame.K_w):
                     up = True
 
+                if event.key == pygame.K_0:
+                    player.die()
+
             elif event.type == pygame.KEYUP:
 
                 if event.key in (pygame.K_LEFT, pygame.K_a):
@@ -116,7 +121,12 @@ if __name__ == '__main__':
                             new_blocks_group.add(new_block)
 
                 elif event.button == 1:
-                    player.deal_damage(monsters_group)
+
+                    res = player.deal_damage(monsters_group)
+
+                    for monster in res:
+                        killed_monsters_group.add(monster)
+                        monsters_group.remove(monster)
 
         # обновление всех спрайтов
         player_group.update(left, right, up, tile_group)
@@ -129,11 +139,22 @@ if __name__ == '__main__':
                     player.set_to_go_coords(*checkpoint.get_coords())
                     checkpoint.set_is_on()
 
+                    player.set_refresh_blocks_number(player.get_number_of_blocks())
+                    new_blocks_group.empty()
+
+                    killed_monsters_group.empty()
+
         if pygame.sprite.spritecollideany(player, die_blocks_group):
             is_dead = player.take_damage()
             if is_dead:
+
                 for n_block in new_blocks_group:
                     n_block.kill()
+
+                for monster in killed_monsters_group:
+                    monsters_group.add(monster)
+                    killed_monsters_group.remove(monster)
+
                 sound_death.play()
 
         for monster in monsters_group:
@@ -155,7 +176,6 @@ if __name__ == '__main__':
         for sprite in all_sprites:
             screen.blit(sprite.image, camera.apply(sprite))
         pygame.display.update()
-
         clock.tick(constants.FPS)
         pygame.display.flip()
 

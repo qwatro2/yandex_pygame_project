@@ -140,6 +140,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.y = y
 
         self.number_of_blocks = blocks
+        self.refresh_blocks_number = blocks
         self.direction = 1  # 1, если смотрим направо, иначе 0
         self.healthpoints = hp
         self.immortality = False
@@ -273,7 +274,7 @@ class Player(pygame.sprite.Sprite):
 
     def die(self):
         self.dead = True
-        self.number_of_blocks = 5
+        self.number_of_blocks = self.refresh_blocks_number
         self.healthpoints = 2
         self.immortality_timer = 40
         self.vx = 0
@@ -282,6 +283,9 @@ class Player(pygame.sprite.Sprite):
     def set_to_go_coords(self, x, y):
         self.to_go_x = x
         self.to_go_y = y
+
+    def set_refresh_blocks_number(self, value):
+        self.refresh_blocks_number = value
 
     def add_number_of_blocks(self, value):
         self.number_of_blocks += value
@@ -319,9 +323,14 @@ class Player(pygame.sprite.Sprite):
                                   s_rect.w // 2,
                                   s_rect.h)
 
+        res = []
+
         for monster in monsters:
             if isinstance(monster, BaseMonster) and damage_rect.colliderect(monster.get_rect()):
-                monster.take_damage()
+                if monster.take_damage():
+                    res.append(monster)
+
+        return res
 
 
 class BaseMonster(pygame.sprite.Sprite):
@@ -417,7 +426,6 @@ class BaseMonster(pygame.sprite.Sprite):
         else:
             if self.immortality_timer == 0:
                 self.immortality = False
-
 
 class Camera:
     def __init__(self, camera_func, width, height):

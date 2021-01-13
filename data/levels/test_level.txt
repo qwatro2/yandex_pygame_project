@@ -8,8 +8,8 @@
 00000000000000000000000
 11111111111111111111111
 
-enemy x:1600 y:700 hp:2 v:10 max:200
-enemy x:1950 y:300 hp:2 v:10 max:150
+enemy x:1600 y:700 hp:1 v:10 max:200
+enemy x:1950 y:300 hp:1 v:10 max:150
 checkpoint x:900 y:700 id:1
 checkpoint x:1500 y:500 id:2
 player x:0 y:700 hp:2 blocks:5
