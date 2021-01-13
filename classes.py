@@ -169,6 +169,7 @@ class Player(pygame.sprite.Sprite):
 
         self.dead = False
         self.slash = False
+        self.hurt = False
 
         self.rdying = [
             first_state_funcs.load_image(f'Stone_Dying\Stone_Golem_Dying_{str(i).rjust(3, "0")}.png',
@@ -192,6 +193,15 @@ class Player(pygame.sprite.Sprite):
                                          constants.PLAYER_HEIGHT) for i in range(12)]
         self.lslash_number = 0
 
+        self.rhurt = first_state_funcs.load_image(f'Stone_Hurt_000.png',
+                                                  constants.PLAYER_WIDTH,
+                                                  constants.PLAYER_HEIGHT)
+        self.rhurt_number = 0
+        self.lhurt = first_state_funcs.load_image(f'Stone_Hurt_-000.png',
+                                                  constants.PLAYER_WIDTH,
+                                                  constants.PLAYER_HEIGHT)
+        self.lhurt_number = 0
+
     def update(self, left, right, up, tile_group):
         if self.dead:
             if self.direction == 1:
@@ -206,71 +216,85 @@ class Player(pygame.sprite.Sprite):
                 self.ldying_number = 0
                 self.rdying_number = 0
             pygame.time.wait(100)
+        elif self.slash:
+            self.lwalk_number = 0
+            self.rwalk_number = 0
+            if self.direction == 1:
+                self.image = self.rslash[self.rslash_number]
+                self.rslash_number += 1
+                self.rslash_number %= len(self.rslash)
+                if self.rslash_number == 0:
+                    self.slash = False
+            else:
+                self.image = self.lslash[self.lslash_number]
+                self.lslash_number += 1
+                self.lslash_number %= len(self.lslash)
+                if self.lslash_number == 0:
+                    self.slash = False
+        elif self.hurt:
+            self.lwalk_number = 0
+            self.rwalk_number = 0
+            if self.direction == 1:
+                self.image = self.rhurt
+                self.rhurt_number += 1
+                self.rhurt_number %= 5
+                if self.rhurt_number == 0:
+                    self.hurt = False
+            else:
+                self.image = self.lhurt
+                self.lhurt_number += 1
+                self.lhurt_number %= 5
+                if self.lhurt_number == 0:
+                    self.hurt = False
         else:
-            if self.slash:
+            if left:
+                self.vx = -constants.MOVE_SPEED
+                self.direction = 0
+
+            if right:
+                self.vx = constants.MOVE_SPEED
+                self.direction = 1
+
+            if up:
+                if self.on_ground:
+                    self.vy = -constants.JUMP_POWER
+
+            if not (left or right):
+                self.vx = 0
+
+            if not self.on_ground:
+                self.vy += constants.GRAVITY
+            self.on_ground = False
+            self.rect.x += self.vx
+            self.collide(self.vx, 0, tile_group)
+
+            self.rect.y += self.vy
+            self.collide(0, self.vy, tile_group)
+            if not (-1 < self.vy < 1):
                 self.lwalk_number = 0
                 self.rwalk_number = 0
                 if self.direction == 1:
-                    self.image = self.rslash[self.rslash_number]
-                    self.rslash_number += 1
-                    self.rslash_number %= len(self.rslash)
-                    if self.rslash_number == 0:
-                        self.slash = False
+                    self.image = self.rjump
                 else:
-                    self.image = self.lslash[self.lslash_number]
-                    self.lslash_number += 1
-                    self.lslash_number %= len(self.lslash)
-                    if self.lslash_number == 0:
-                        self.slash = False
+                    self.image = self.ljump
+            elif left or right:
+                if self.direction == 1:
+                    self.lwalk_number = 0
+                    self.image = self.rwalk[self.rwalk_number]
+                    self.rwalk_number += 1
+                    self.rwalk_number %= len(self.rwalk)
+                else:
+                    self.rwalk_number = 0
+                    self.image = self.lwalk[self.lwalk_number]
+                    self.lwalk_number += 1
+                    self.lwalk_number %= len(self.lwalk)
             else:
-                if left:
-                    self.vx = -constants.MOVE_SPEED
-                    self.direction = 0
-
-                if right:
-                    self.vx = constants.MOVE_SPEED
-                    self.direction = 1
-
-                if up:
-                    if self.on_ground:
-                        self.vy = -constants.JUMP_POWER
-
-                if not (left or right):
-                    self.vx = 0
-
-                if not self.on_ground:
-                    self.vy += constants.GRAVITY
-                self.on_ground = False
-                self.rect.x += self.vx
-                self.collide(self.vx, 0, tile_group)
-
-                self.rect.y += self.vy
-                self.collide(0, self.vy, tile_group)
-                if not (-1 < self.vy < 1):
-                    self.lwalk_number = 0
-                    self.rwalk_number = 0
-                    if self.direction == 1:
-                        self.image = self.rjump
-                    else:
-                        self.image = self.ljump
-                elif left or right:
-                    if self.direction == 1:
-                        self.lwalk_number = 0
-                        self.image = self.rwalk[self.rwalk_number]
-                        self.rwalk_number += 1
-                        self.rwalk_number %= len(self.rwalk)
-                    else:
-                        self.rwalk_number = 0
-                        self.image = self.lwalk[self.lwalk_number]
-                        self.lwalk_number += 1
-                        self.lwalk_number %= len(self.lwalk)
+                if self.direction == 1:
+                    self.image = Player.rimage
                 else:
-                    if self.direction == 1:
-                        self.image = Player.rimage
-                    else:
-                        self.image = Player.limage
-                    self.rwalk_number = 0
-                    self.lwalk_number = 0
+                    self.image = Player.limage
+                self.rwalk_number = 0
+                self.lwalk_number = 0
         if self.immortality_timer > 0:
             self.immortality_timer -= 1
 
@@ -327,10 +351,12 @@ class Player(pygame.sprite.Sprite):
             self.healthpoints -= 1
 
             self.immortality = True
-            self.immortality_timer = 40
+            self.immortality_timer = 45
             if self.healthpoints == 0:
                 self.die()
                 return True
+            else:
+                self.hurt = True
             return False
         else:
             if self.immortality_timer == 0:
