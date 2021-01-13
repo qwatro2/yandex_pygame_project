@@ -70,7 +70,7 @@ class Checkpoint(pygame.sprite.Sprite):
     Класс Чекпоинта.
     '''
 
-    def __init__(self, x, y, *groups):
+    def __init__(self, x, y, id, *groups):
         super().__init__(*groups)
         sheet = first_state_funcs.load_image('11_fire_spritesheet.png', 800, 800)
         self.frames = self.cut_sheet(sheet, 8, 8, 43, 20)
@@ -81,6 +81,7 @@ class Checkpoint(pygame.sprite.Sprite):
         self.rect.top = y
         self.x = x
         self.y = y
+        self.id = id
         self.is_on = False
 
     def cut_sheet(self, sheet, columns, rows, width, height):
@@ -130,16 +131,16 @@ class Player(pygame.sprite.Sprite):
     rimage = first_state_funcs.load_image('Stone_Golem.png', constants.PLAYER_WIDTH, constants.PLAYER_HEIGHT)
     limage = first_state_funcs.load_image('Stone_Golem-.png', constants.PLAYER_WIDTH, constants.PLAYER_HEIGHT)
 
-    def __init__(self, x, y, *groups):
+    def __init__(self, x, y, hp, blocks, *groups):
         super().__init__(*groups)
         self.image = Player.rimage
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
 
-        self.number_of_blocks = 5
+        self.number_of_blocks = blocks
         self.direction = 1  # 1, если смотрим направо, иначе 0
-        self.healthpoints = 2
+        self.healthpoints = hp
         self.immortality = False
         self.immortality_timer = 0
 
@@ -350,7 +351,7 @@ class Player(pygame.sprite.Sprite):
 
 class BaseMonster(pygame.sprite.Sprite):
 
-    def __init__(self, x, y, vx, max_left, *groups):
+    def __init__(self, x, y, vx, max_left, hp, *groups):
         super().__init__(*groups)
         self.rwalk = [
             first_state_funcs.load_image(f'Enemy_Walking\Enemy_Walking_{str(i).rjust(3, "0")}.png',
@@ -373,7 +374,7 @@ class BaseMonster(pygame.sprite.Sprite):
         self.max_left = max_left
         self.on_ground = True
 
-        self.healthpoints = 1
+        self.healthpoints = hp
         self.immortality = False
         self.immortality_timer = 0
 
@@ -400,6 +401,7 @@ class BaseMonster(pygame.sprite.Sprite):
             self.image = self.rwalk[self.rwalk_number]
             self.rwalk_number += 1
             self.rwalk_number %= len(self.rwalk)
+
         if self.immortality_timer > 0:
             self.immortality_timer -= 1
 
@@ -422,6 +424,9 @@ class BaseMonster(pygame.sprite.Sprite):
                     self.on_ground = True
                     self.vy = 0
 
+    def die(self):
+        self.kill()
+
     def get_rect(self):
         return self.rect
 
@@ -429,7 +434,7 @@ class BaseMonster(pygame.sprite.Sprite):
         if not self.immortality:
             self.healthpoints -= 1
             self.immortality = True
-            self.immortality_timer = 20
+            self.immortality_timer = 40
             if self.healthpoints == 0:
                 self.die()
                 return True
@@ -437,9 +442,6 @@ class BaseMonster(pygame.sprite.Sprite):
         else:
             if self.immortality_timer == 0:
                 self.immortality = False
-
-    def die(self):
-        self.kill()
 
 
 class Camera:

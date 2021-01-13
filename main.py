@@ -30,11 +30,16 @@ if __name__ == '__main__':
     pygame.display.set_caption('caption')
 
     # генерация уровня
-    level_map = first_state_funcs.load_level('test_level.txt')
-    player, level_width, level_height = second_state_funcs.generate_level(level_map, tile_group, player_group,
-                                                                          checkpoints_group, die_blocks_group,
-                                                                          monsters_group,
-                                                                          all_sprites)
+    level_map, entities = first_state_funcs.load_level('test_level.txt').values()
+    sprite_groups = {
+        'all': all_sprites,
+        'tiles': tile_group,
+        'traps': die_blocks_group,
+        'player': player_group,
+        'monsters': monsters_group,
+        'checkpoints': checkpoints_group
+    }
+    player, level_width, level_height = second_state_funcs.generate_level(level_map, entities, sprite_groups)
 
     # добавляем камеру
     camera = classes.Camera(second_state_funcs.camera_configure, (level_width + 1) * constants.TILE_WIDTH,
