@@ -45,8 +45,8 @@ def generate_level(level_map: list, tile_group: pygame.sprite.Group, player_grou
 
             elif level_map[y][x] == '5':
                 classes.BaseMonster(x * constants.TILE_WIDTH, y * constants.TILE_HEIGHT,
-                                    constants.MONSTER_SPEED_X, constants.MONSTER_SPEED_Y,
-                                    constants.TILE_WIDTH * 5, constants.TILE_HEIGHT, monsters_group, all_sprites)
+                                    constants.MONSTER_SPEED_X, constants.TILE_WIDTH * 5,
+                                    monsters_group, all_sprites)
 
     new_player = classes.Player(player_x * constants.TILE_WIDTH, player_y * constants.TILE_HEIGHT,
                                 player_group, all_sprites)

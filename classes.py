@@ -309,7 +309,7 @@ class Player(pygame.sprite.Sprite):
 
 class BaseMonster(pygame.sprite.Sprite):
 
-    def __init__(self, x, y, vx, vy, max_left, max_up, *groups):
+    def __init__(self, x, y, vx, max_left, *groups):
         super().__init__(*groups)
         self.rwalk = [
             first_state_funcs.load_image(f'Enemy_Walking\Enemy_Walking_{str(i).rjust(3, "0")}.png',
@@ -328,9 +328,8 @@ class BaseMonster(pygame.sprite.Sprite):
         self.start_x = x
         self.start_y = y
         self.vx = vx
-        self.vy = vy
+        self.vy = 0
         self.max_left = max_left
-        self.max_up = max_up
         self.on_ground = True
 
     def update(self, platforms):
