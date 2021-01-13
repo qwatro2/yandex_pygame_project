@@ -28,6 +28,8 @@ if __name__ == '__main__':
     new_blocks_group = pygame.sprite.Group()
     killed_monsters_group = pygame.sprite.Group()
 
+    hearth_image = first_state_funcs.load_image('hearth.png', constants.TILE_WIDTH // 2, constants.TILE_HEIGHT // 2)
+
     left, right, up = [False] * 3
 
     # TODO: изменить заголовок и иконку игры
@@ -175,7 +177,14 @@ if __name__ == '__main__':
         camera.update(player)
         for sprite in all_sprites:
             screen.blit(sprite.image, camera.apply(sprite))
+
+        for i in range(player.get_healthpoints()):
+            screen.blit(hearth_image, (i * hearth_image.get_rect().w + constants.TILE_WIDTH // 4,
+                                       constants.TILE_HEIGHT // 4,
+                                       hearth_image.get_rect().w, hearth_image.get_rect().h))
+
         pygame.display.update()
+
         clock.tick(constants.FPS)
         pygame.display.flip()
 
