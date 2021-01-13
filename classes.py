@@ -346,6 +346,9 @@ class Player(pygame.sprite.Sprite):
     def get_direction(self):
         return self.direction
 
+    def get_healthpoints(self):
+        return self.healthpoints
+
     def take_damage(self):
         if not self.immortality:
             self.healthpoints -= 1
