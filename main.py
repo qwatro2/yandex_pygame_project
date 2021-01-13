@@ -24,7 +24,7 @@ if __name__ == '__main__':
     new_blocks_group = pygame.sprite.Group()
     die_blocks_group = pygame.sprite.Group()
     monsters_group = pygame.sprite.Group()
-    hearth_image = first_state_funcs.load_image('hearth.png', constants.TILE_WIDTH // 2, constants.TILE_HEIGHT // 2)
+    hearth_image = first_state_funcs.load_image('hearth.png', constants.TILE_WIDTH // 4, constants.TILE_HEIGHT // 4)
     left, right, up = [False] * 3
 
     # TODO: изменить заголовок и иконку игры
