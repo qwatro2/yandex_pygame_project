@@ -270,6 +270,11 @@ class Player(pygame.sprite.Sprite):
 
     def die(self):
         self.dead = True
+        self.number_of_blocks = 5
+        self.healthpoints = 2
+        self.immortality_timer = 40
+        self.vx = 0
+        self.vy = 0
 
     def set_to_go_coords(self, x, y):
         self.to_go_x = x
