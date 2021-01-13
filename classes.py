@@ -306,6 +306,17 @@ class Player(pygame.sprite.Sprite):
             if self.immortality_timer == 0:
                 self.immortality = False
 
+    def deal_damage(self, monsters: pygame.sprite.Group):
+        s_rect = self.rect
+        damage_rect = pygame.Rect(s_rect.right if self.direction == 1 else s_rect.left,
+                                  s_rect.top,
+                                  s_rect.w // 2,
+                                  s_rect.h)
+
+        for monster in monsters:
+            if isinstance(monster, BaseMonster) and damage_rect.colliderect(monster.get_rect()):
+                monster.take_damage()
+
 
 class BaseMonster(pygame.sprite.Sprite):
 
@@ -332,6 +343,10 @@ class BaseMonster(pygame.sprite.Sprite):
         self.max_left = max_left
         self.on_ground = True
 
+        self.healthpoints = 2
+        self.immortality = False
+        self.immortality_timer = 0
+
     def update(self, platforms):
         self.rect.x += self.vx
         self.collide(self.vx, 0, platforms)
@@ -355,6 +370,8 @@ class BaseMonster(pygame.sprite.Sprite):
             self.image = self.rwalk[self.rwalk_number]
             self.rwalk_number += 1
             self.rwalk_number %= len(self.rwalk)
+        if self.immortality_timer > 0:
+            self.immortality_timer -= 1
 
     def collide(self, vx, vy, platforms):
 
@@ -377,6 +394,22 @@ class BaseMonster(pygame.sprite.Sprite):
 
     def get_rect(self):
         return self.rect
+
+    def take_damage(self):
+        if not self.immortality:
+            self.healthpoints -= 1
+            self.immortality = True
+            self.immortality_timer = 20
+            if self.healthpoints == 0:
+                self.die()
+                return True
+            return False
+        else:
+            if self.immortality_timer == 0:
+                self.immortality = False
+
+    def die(self):
+        self.kill()
 
 
 class Camera:

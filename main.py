@@ -81,7 +81,7 @@ if __name__ == '__main__':
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
 
-                if event.button == 1:
+                if event.button == 3:
 
                     if player.get_number_of_blocks() > 0:
 
@@ -107,6 +107,9 @@ if __name__ == '__main__':
                             tile_group.add(new_block)
                             all_sprites.add(new_block)
                             new_blocks_group.add(new_block)
+
+                elif event.button == 1:
+                    player.deal_damage(monsters_group)
 
         # обновление всех спрайтов
         player_group.update(left, right, up, tile_group)
