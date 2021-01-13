@@ -40,7 +40,7 @@ class DieBlock(BaseBlock):
     def __init__(self, x, y, *groups):
         super().__init__(x, y, *groups)
         sheet = first_state_funcs.load_image('12_nebula_spritesheet.png', 800, 800)
-        self.frames = self.cut_sheet(sheet, 8, 8)
+        self.frames = self.cut_sheet(sheet, 8, 8, 20, 20)
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
         self.rect = self.image.get_rect()
@@ -50,16 +50,16 @@ class DieBlock(BaseBlock):
     def get_rect(self):
         return self.rect
 
-    def cut_sheet(self, sheet, columns, rows):
+    def cut_sheet(self, sheet, columns, rows, width, height):
         self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
                                 sheet.get_height() // rows)
         frames = []
         for j in range(rows):
             for i in range(columns):
                 if i + j < 10:
-                    frame_location = (self.rect.w * i, self.rect.h * j)
+                    frame_location = (self.rect.w * i + width, self.rect.h * j + height)
                     frames.append(sheet.subsurface(pygame.Rect(
-                        frame_location, self.rect.size)))
+                        frame_location, (self.rect.size[0] - width, self.rect.size[1] - height))))
                     if frames[-1].get_width() != constants.TILE_WIDTH or frames[
                         -1].get_height() != constants.TILE_HEIGHT:
                         frames[-1] = pygame.transform.scale(frames[-1],
@@ -330,6 +330,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
+
     def die(self):
         self.dead = True
         self.number_of_blocks = 5
@@ -394,13 +395,13 @@ class BaseMonster(pygame.sprite.Sprite):
         super().__init__(*groups)
         self.rwalk = [
             first_state_funcs.load_image(f'Enemy_Walking\Enemy_Walking_{str(i).rjust(3, "0")}.png',
-                                         constants.PLAYER_WIDTH*hp//2,
-                                         constants.PLAYER_HEIGHT*hp//2) for i in range(18)]
+                                         constants.PLAYER_WIDTH * hp // 2,
+                                         constants.PLAYER_HEIGHT * hp // 2) for i in range(18)]
         self.rwalk_number = 0
         self.lwalk = [
             first_state_funcs.load_image(f'Enemy_Walking\Enemy_Walking_-{str(i).rjust(3, "0")}.png',
-                                         constants.PLAYER_WIDTH*hp//2,
-                                         constants.PLAYER_HEIGHT*hp//2) for i in range(18)]
+                                         constants.PLAYER_WIDTH * hp // 2,
+                                         constants.PLAYER_HEIGHT * hp // 2) for i in range(18)]
         self.lwalk_number = 0
         self.image = self.rwalk[0]
         self.rect = self.image.get_rect()
