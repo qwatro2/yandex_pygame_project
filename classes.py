@@ -367,6 +367,7 @@ class Player(pygame.sprite.Sprite):
 
     def deal_damage(self, monsters: pygame.sprite.Group):
         self.slash = True
+        is_kill = False
         s_rect = self.rect
         damage_rect = pygame.Rect(s_rect.right if self.direction == 1 else s_rect.left,
                                   s_rect.top,
@@ -375,7 +376,8 @@ class Player(pygame.sprite.Sprite):
 
         for monster in monsters:
             if isinstance(monster, BaseMonster) and damage_rect.colliderect(monster.get_rect()):
-                monster.take_damage()
+                is_kill = monster.take_damage()
+        return is_kill
 
 
 class BaseMonster(pygame.sprite.Sprite):

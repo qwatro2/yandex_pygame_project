@@ -16,6 +16,7 @@ if __name__ == '__main__':
     pygame.mixer.music.play(-1)
     sound_death = pygame.mixer.Sound('data\music\death.ogg')
     sound_death.set_volume(0.5)
+    sound_enemy_death = pygame.mixer.Sound('data\music\Enemy_death.wav')
     clock = pygame.time.Clock()
     all_sprites = pygame.sprite.Group()
     tile_group = pygame.sprite.Group()
@@ -46,17 +47,26 @@ if __name__ == '__main__':
     camera = classes.Camera(second_state_funcs.camera_configure, (level_width + 1) * constants.TILE_WIDTH,
                             (level_height + 1) * constants.TILE_HEIGHT)
 
-    # игровой цикл
     is_dead = False
+    is_kill = False
     x = 0
+    y = 0
+
+    # игровой цикл
     while game_loop:
         if is_dead:
+            is_kill = False
             x += 1
         if x > 22:
             x = 0
             is_dead = False
             sound_death.stop()
-
+        if not is_dead and is_kill:
+            y += 1
+        if y > 25 and not is_dead:
+            y = 0
+            is_kill = False
+            sound_enemy_death.stop()
         # обработка событий
         for event in pygame.event.get():
 
@@ -115,7 +125,9 @@ if __name__ == '__main__':
                             new_blocks_group.add(new_block)
 
                 elif event.button == 1:
-                    player.deal_damage(monsters_group)
+                    is_kill = player.deal_damage(monsters_group)
+                    if is_kill:
+                        sound_enemy_death.play()
 
         # обновление всех спрайтов
         player_group.update(left, right, up, tile_group)
