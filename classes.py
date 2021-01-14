@@ -4,6 +4,14 @@ import constants
 import first_state_funcs
 
 
+class Background(pygame.sprite.Sprite):
+    def __init__(self, image_file, location):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = first_state_funcs.load_image(image_file, constants.WIDTH, constants.HEIGHT)
+        self.rect = self.image.get_rect()
+        self.rect.left, self.rect.top = location
+
+
 class BaseBlock(pygame.sprite.Sprite):
     '''
     Класс Базового Блока.
@@ -29,11 +37,10 @@ class DieBlock(BaseBlock):
     При коллайде с ним, герой получает урон.
     '''
 
-    sheet = first_state_funcs.load_image('12_nebula_spritesheet.png', 800, 800)
-
     def __init__(self, x, y, *groups):
         super().__init__(x, y, *groups)
-        self.frames = self.cut_sheet(DieBlock.sheet, 8, 8)
+        sheet = first_state_funcs.load_image('12_nebula_spritesheet.png', 800, 800)
+        self.frames = self.cut_sheet(sheet, 8, 8, 20, 20)
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
         self.rect = self.image.get_rect()
@@ -43,16 +50,16 @@ class DieBlock(BaseBlock):
     def get_rect(self):
         return self.rect
 
-    def cut_sheet(self, sheet, columns, rows):
+    def cut_sheet(self, sheet, columns, rows, width, height):
         self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
                                 sheet.get_height() // rows)
         frames = []
         for j in range(rows):
             for i in range(columns):
                 if i + j < 10:
-                    frame_location = (self.rect.w * i, self.rect.h * j)
+                    frame_location = (self.rect.w * i + width, self.rect.h * j + height)
                     frames.append(sheet.subsurface(pygame.Rect(
-                        frame_location, self.rect.size)))
+                        frame_location, (self.rect.size[0] - width, self.rect.size[1] - height))))
                     if frames[-1].get_width() != constants.TILE_WIDTH or frames[
                         -1].get_height() != constants.TILE_HEIGHT:
                         frames[-1] = pygame.transform.scale(frames[-1],
@@ -143,8 +150,10 @@ class Player(pygame.sprite.Sprite):
         self.refresh_blocks_number = blocks
         self.direction = 1  # 1, если смотрим направо, иначе 0
         self.healthpoints = hp
+        self.hp_level = hp
         self.immortality = False
         self.immortality_timer = 0
+        self.number_of_deaths = 0
 
         self.to_go_x = x
         self.to_go_y = y
@@ -170,6 +179,9 @@ class Player(pygame.sprite.Sprite):
                                                   constants.PLAYER_HEIGHT)
 
         self.dead = False
+        self.slash = False
+        self.hurt = False
+
         self.rdying = [
             first_state_funcs.load_image(f'Stone_Dying\Stone_Golem_Dying_{str(i).rjust(3, "0")}.png',
                                          constants.PLAYER_WIDTH,
@@ -180,6 +192,26 @@ class Player(pygame.sprite.Sprite):
                                          constants.PLAYER_WIDTH,
                                          constants.PLAYER_HEIGHT) for i in range(15)]
         self.ldying_number = 0
+
+        self.rslash = [
+            first_state_funcs.load_image(f'Stone_Slashing\Stone_Slashing_{str(i).rjust(3, "0")}.png',
+                                         constants.PLAYER_WIDTH + 40,
+                                         constants.PLAYER_HEIGHT) for i in range(12)]
+        self.rslash_number = 0
+        self.lslash = [
+            first_state_funcs.load_image(f'Stone_Slashing\Stone_Slashing_-{str(i).rjust(3, "0")}.png',
+                                         constants.PLAYER_WIDTH + 40,
+                                         constants.PLAYER_HEIGHT) for i in range(12)]
+        self.lslash_number = 0
+
+        self.rhurt = first_state_funcs.load_image(f'Stone_Hurt_000.png',
+                                                  constants.PLAYER_WIDTH,
+                                                  constants.PLAYER_HEIGHT)
+        self.rhurt_number = 0
+        self.lhurt = first_state_funcs.load_image(f'Stone_Hurt_-000.png',
+                                                  constants.PLAYER_WIDTH,
+                                                  constants.PLAYER_HEIGHT)
+        self.lhurt_number = 0
 
     def update(self, left, right, up, tile_group):
         if self.dead:
@@ -195,6 +227,36 @@ class Player(pygame.sprite.Sprite):
                 self.ldying_number = 0
                 self.rdying_number = 0
             pygame.time.wait(100)
+        elif self.slash:
+            self.lwalk_number = 0
+            self.rwalk_number = 0
+            if self.direction == 1:
+                self.image = self.rslash[self.rslash_number]
+                self.rslash_number += 1
+                self.rslash_number %= len(self.rslash)
+                if self.rslash_number == 0:
+                    self.slash = False
+            else:
+                self.image = self.lslash[self.lslash_number]
+                self.lslash_number += 1
+                self.lslash_number %= len(self.lslash)
+                if self.lslash_number == 0:
+                    self.slash = False
+        elif self.hurt:
+            self.lwalk_number = 0
+            self.rwalk_number = 0
+            if self.direction == 1:
+                self.image = self.rhurt
+                self.rhurt_number += 1
+                self.rhurt_number %= 5
+                if self.rhurt_number == 0:
+                    self.hurt = False
+            else:
+                self.image = self.lhurt
+                self.lhurt_number += 1
+                self.lhurt_number %= 5
+                if self.lhurt_number == 0:
+                    self.hurt = False
         else:
             if left:
                 self.vx = -constants.MOVE_SPEED
@@ -244,7 +306,6 @@ class Player(pygame.sprite.Sprite):
                     self.image = Player.limage
                 self.rwalk_number = 0
                 self.lwalk_number = 0
-
         if self.immortality_timer > 0:
             self.immortality_timer -= 1
 
@@ -272,10 +333,14 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
+    def get_deaths(self):
+        return self.number_of_deaths
+
     def die(self):
+        self.number_of_deaths += 1
         self.dead = True
         self.number_of_blocks = self.refresh_blocks_number
-        self.healthpoints = 2
+        self.healthpoints = self.hp_level
         self.immortality_timer = 40
         self.vx = 0
         self.vy = 0
@@ -305,17 +370,22 @@ class Player(pygame.sprite.Sprite):
     def take_damage(self):
         if not self.immortality:
             self.healthpoints -= 1
+
             self.immortality = True
-            self.immortality_timer = 40
+            self.immortality_timer = 45
             if self.healthpoints == 0:
                 self.die()
                 return True
+            else:
+                self.hurt = True
             return False
         else:
             if self.immortality_timer == 0:
                 self.immortality = False
 
     def deal_damage(self, monsters: pygame.sprite.Group):
+        self.slash = True
+        is_kill = False
         s_rect = self.rect
         damage_rect = pygame.Rect(s_rect.right if self.direction == 1 else s_rect.left,
                                   s_rect.top,
@@ -324,7 +394,8 @@ class Player(pygame.sprite.Sprite):
 
         for monster in monsters:
             if isinstance(monster, BaseMonster) and damage_rect.colliderect(monster.get_rect()):
-                monster.take_damage()
+                is_kill = monster.take_damage()
+        return is_kill
 
 
 class BaseMonster(pygame.sprite.Sprite):
@@ -333,13 +404,13 @@ class BaseMonster(pygame.sprite.Sprite):
         super().__init__(*groups)
         self.rwalk = [
             first_state_funcs.load_image(f'Enemy_Walking\Enemy_Walking_{str(i).rjust(3, "0")}.png',
-                                         constants.PLAYER_WIDTH,
-                                         constants.PLAYER_HEIGHT) for i in range(18)]
+                                         constants.PLAYER_WIDTH * hp // 2,
+                                         constants.PLAYER_HEIGHT * hp // 2) for i in range(18)]
         self.rwalk_number = 0
         self.lwalk = [
             first_state_funcs.load_image(f'Enemy_Walking\Enemy_Walking_-{str(i).rjust(3, "0")}.png',
-                                         constants.PLAYER_WIDTH,
-                                         constants.PLAYER_HEIGHT) for i in range(18)]
+                                         constants.PLAYER_WIDTH * hp // 2,
+                                         constants.PLAYER_HEIGHT * hp // 2) for i in range(18)]
         self.lwalk_number = 0
         self.image = self.rwalk[0]
         self.rect = self.image.get_rect()
