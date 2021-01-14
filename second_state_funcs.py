@@ -5,6 +5,7 @@ import classes
 
 def generate_level(level_map: list, entities: list, sprite_groups: dict) -> tuple:
     new_player, x, y = [None] * 3
+    number_of_checkpoints = 0
 
     for y in range(len(level_map)):
         for x in range(len(level_map[y])):
@@ -26,10 +27,11 @@ def generate_level(level_map: list, entities: list, sprite_groups: dict) -> tupl
             classes.BaseMonster(entity['x'], entity['y'], entity['v'], entity['max'], entity['hp'],
                                 sprite_groups['monsters'], sprite_groups['all'])
         elif entity['name'] == 'checkpoint':
+            number_of_checkpoints += 1
             classes.Checkpoint(entity['x'], entity['y'], entity['id'],
                                sprite_groups['checkpoints'], sprite_groups['all'])
 
-    return new_player, x, y
+    return new_player, x, y, number_of_checkpoints
 
 
 def camera_configure(camera, target_rect) -> pygame.Rect:

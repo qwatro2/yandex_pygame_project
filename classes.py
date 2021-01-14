@@ -151,6 +151,7 @@ class Player(pygame.sprite.Sprite):
         self.healthpoints = hp
         self.immortality = False
         self.immortality_timer = 0
+        self.number_of_deaths = 0
 
         self.to_go_x = x
         self.to_go_y = y
@@ -330,7 +331,11 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
+    def get_deaths(self):
+        return self.number_of_deaths
+
     def die(self):
+        self.number_of_deaths += 1
         self.dead = True
         self.number_of_blocks = 5
         self.healthpoints = 2
