@@ -31,8 +31,8 @@ if __name__ == '__main__':
 
     left, right, up = [False] * 3
 
-    # TODO: изменить заголовок и иконку игры
-    pygame.display.set_caption('caption')
+    pygame.display.set_caption("Golem's Story")
+    pygame.display.set_icon(pygame.image.load('data/bmp_icon.bmp').convert())
 
     # генерация уровня
     level_map, entities = first_state_funcs.load_level('test_level.txt').values()
