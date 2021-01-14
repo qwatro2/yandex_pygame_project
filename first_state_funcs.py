@@ -34,6 +34,14 @@ def load_image(filename: str, width: int, height: int, colorkey=None) -> pygame.
 
 
 def load_level(filename: str) -> dict:
+
+    '''
+
+    :param filename: краткое имя файла
+    :return: словарь из карты статичных объектов и списка нестатичных
+    '''
+
+    # получаем полное имя файла
     fullname = f'data/levels/{filename}'
 
     # читаем карту уровня из файла

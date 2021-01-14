@@ -13,12 +13,23 @@ if __name__ == '__main__':
     game_loop = True
     screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
     background = classes.Background('image_background.png', [0, 0])
+    end = False
+    is_dead = False
+    is_kill = False
+    x = 0
+    y = 0
+
+    # фоновая музыка
     pygame.mixer.music.load('data\music\music_background.wav')
     pygame.mixer.music.play(-1)
+
+    # звук смерти
     sound_death = pygame.mixer.Sound('data\music\death.ogg')
     sound_death.set_volume(0.5)
     sound_enemy_death = pygame.mixer.Sound('data\music\Enemy_death.wav')
+
     clock = pygame.time.Clock()
+
     all_sprites = pygame.sprite.Group()
     tile_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
@@ -26,7 +37,9 @@ if __name__ == '__main__':
     new_blocks_group = pygame.sprite.Group()
     die_blocks_group = pygame.sprite.Group()
     monsters_group = pygame.sprite.Group()
+
     hearth_image = first_state_funcs.load_image('hearth.png', constants.TILE_WIDTH // 4, constants.TILE_HEIGHT // 4)
+
     left, right, up = [False] * 3
 
     pygame.display.set_caption("Golem's Story")
@@ -49,14 +62,9 @@ if __name__ == '__main__':
     camera = classes.Camera(second_state_funcs.camera_configure, (level_width + 1) * constants.TILE_WIDTH,
                             (level_height + 1) * constants.TILE_HEIGHT)
 
-    end = False
-    is_dead = False
-    is_kill = False
-    x = 0
-    y = 0
-
     # игровой цикл
     while game_loop:
+
         if end:
             pygame.draw.rect(screen, pygame.Color('white'),
                              ((0, 0),
@@ -84,6 +92,7 @@ if __name__ == '__main__':
                 y = 0
                 is_kill = False
                 sound_enemy_death.stop()
+
             # обработка событий
             for event in pygame.event.get():
 
@@ -100,6 +109,12 @@ if __name__ == '__main__':
 
                     if event.key in (pygame.K_SPACE, pygame.K_UP, pygame.K_w):
                         up = True
+
+                    if event.key == pygame.K_0:
+                        player.die()
+                        for n_block in new_blocks_group:
+                            n_block.kill()
+                        sound_death.play()
 
                 elif event.type == pygame.KEYUP:
 
@@ -149,6 +164,7 @@ if __name__ == '__main__':
             # обновление всех спрайтов
             player_group.update(left, right, up, tile_group)
             monsters_group.update(tile_group)
+
             number = 0
             for checkpoint in checkpoints_group:
                 if isinstance(checkpoint, classes.Checkpoint) and checkpoint.get_is_on():
@@ -158,6 +174,7 @@ if __name__ == '__main__':
                     if isinstance(checkpoint, classes.Checkpoint) and not checkpoint.get_is_on():
                         player.set_to_go_coords(*checkpoint.get_coords())
                         checkpoint.set_is_on()
+
             if pygame.sprite.spritecollideany(player, die_blocks_group):
                 is_dead = player.take_damage()
                 if is_dead:
@@ -174,8 +191,10 @@ if __name__ == '__main__':
                         for n_block in new_blocks_group:
                             n_block.kill()
                         sound_death.play()
+
             checkpoints_group.update()
             die_blocks_group.update()
+
             # отрисовка всех спрайтов
             screen.fill([255, 255, 255])
             screen.blit(background.image, background.rect)
@@ -183,10 +202,19 @@ if __name__ == '__main__':
             for sprite in all_sprites:
                 screen.blit(sprite.image, camera.apply(sprite))
 
+            # отрисовка здоровья
             for i in range(player.get_healthpoints()):
                 screen.blit(hearth_image, (i * hearth_image.get_rect().w + constants.TILE_WIDTH // 4,
                                            constants.TILE_HEIGHT // 4,
                                            hearth_image.get_rect().w, hearth_image.get_rect().h))
+
+            # показываем кол-во доступных блоков
+            font = pygame.font.Font(None, 50)
+            text = font.render(f'Блоки: {player.get_number_of_blocks()}', True,
+                               pygame.Color('white'))
+            text_x = constants.TILE_WIDTH // 4
+            text_y = constants.TILE_HEIGHT // 2 + hearth_image.get_rect().h
+            screen.blit(text, (text_x, text_y))
 
         pygame.display.update()
         clock.tick(constants.FPS)

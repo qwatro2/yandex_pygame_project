@@ -5,6 +5,11 @@ import first_state_funcs
 
 
 class Background(pygame.sprite.Sprite):
+
+    '''
+    Класс Фона.
+    '''
+
     def __init__(self, image_file, location):
         pygame.sprite.Sprite.__init__(self)
         self.image = first_state_funcs.load_image(image_file, constants.WIDTH, constants.HEIGHT)
@@ -494,6 +499,12 @@ class BaseMonster(pygame.sprite.Sprite):
 
 
 class Camera:
+
+    '''
+    Класс Камеры.
+    Отвечает за корректное отображение игровых объектов
+    '''
+
     def __init__(self, camera_func, width, height):
         self.camera_func = camera_func
         self.state = pygame.Rect(0, 0, width, height)

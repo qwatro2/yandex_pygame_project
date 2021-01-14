@@ -4,6 +4,14 @@ import classes
 
 
 def generate_level(level_map: list, entities: list, sprite_groups: dict) -> tuple:
+
+    '''
+    Функция генерирует уровень.
+    :param level_map: матрица статичных объектов
+    :param entities: список нестатичных объектов
+    :param sprite_groups: словарь групп спрайтов
+    :return: экзмепляр класса classes.Player, длину и ширину уровня, кол-во чекпоинтов на уровне
+    '''
     
     new_player, x, y = [None] * 3
     number_of_checkpoints = 0
@@ -38,7 +46,15 @@ def generate_level(level_map: list, entities: list, sprite_groups: dict) -> tupl
     return new_player, x, y, number_of_checkpoints
 
 
-def camera_configure(camera, target_rect) -> pygame.Rect:
+def camera_configure(camera: pygame.Rect, target_rect: pygame.Rect) -> pygame.Rect:
+
+    '''
+
+    :param camera: Rect экземпляра класса classes.Camera
+    :param target_rect: экземпляр класса pygame.Rect
+    :return: часть поля, которую нужно отобразить
+    '''
+
     left, top, _, _ = target_rect
     _, _, w, h = camera
     left, top = -left + constants.WIDTH // 2, -top + constants.HEIGHT // 2
